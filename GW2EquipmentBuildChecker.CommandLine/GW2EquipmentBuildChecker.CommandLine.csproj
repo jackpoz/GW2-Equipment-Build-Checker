@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GW2EquipmentBuildChecker.Core\GW2EquipmentBuildChecker.Core.csproj" />
   </ItemGroup>
 
