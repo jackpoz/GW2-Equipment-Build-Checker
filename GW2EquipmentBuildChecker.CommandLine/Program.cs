@@ -37,8 +37,24 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var builds = await api.GetBuilds(selectedCharacterName);
 
             // 4. Pick 1 build
+            Console.WriteLine("Builds list:");
+            foreach (var build in builds)
+            {
+                if (string.IsNullOrEmpty(build.Build.Name))
+                    build.Build.Name = $"(Unnamed {build.Tab})";
 
-            // 5. Get the list
+                Console.WriteLine($"{build.Tab}: {build.Build.Name}");
+            }
+
+            Console.WriteLine("\nPick a build by writing the number...");
+
+            if (!int.TryParse(Console.ReadLine(), out var buildChoice) && buildChoice > 0 && buildChoice <= builds.Length)
+            {
+                Console.WriteLine("Invalid build choice");
+                return;
+            }
+
+            var selectedBuild = builds.Where(b => b.Tab == buildChoice).First();
 
             // 5. Get the build from gw2skills
 

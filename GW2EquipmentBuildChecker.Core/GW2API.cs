@@ -23,7 +23,7 @@ namespace GW2EquipmentBuildChecker.Core
             return characterNames.Order().ToArray();
         }
 
-        public async Task<object> GetBuilds(string selectedCharacterName)
+        public async Task<BuildContainer[]> GetBuilds(string selectedCharacterName)
         {
             string apiUrl = $"{BaseUrl}/characters/{EscapeCharacterName(selectedCharacterName)}/buildtabs?tabs=all";
 
