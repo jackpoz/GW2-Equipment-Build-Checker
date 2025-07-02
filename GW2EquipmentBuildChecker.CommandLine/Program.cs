@@ -31,9 +31,10 @@ namespace GW2EquipmentBuildChecker.CommandLine
                 return;
             }
 
-            var selectedCharacter = characterNames[characterChoice - 1];
+            var selectedCharacterName = characterNames[characterChoice - 1];
 
             // 3. Get the list of builds
+            var builds = await api.GetBuilds(selectedCharacterName);
 
             // 4. Pick 1 build
 
@@ -42,6 +43,8 @@ namespace GW2EquipmentBuildChecker.CommandLine
             // 5. Get the build from gw2skills
 
             // 6. Compare and find differences
+
+            // 7. Tell what to change
         }
     }
 }
