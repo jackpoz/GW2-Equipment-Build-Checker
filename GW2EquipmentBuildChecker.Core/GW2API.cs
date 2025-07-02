@@ -28,11 +28,7 @@ namespace GW2EquipmentBuildChecker.Core
             string apiUrl = $"{BaseUrl}/characters/{EscapeCharacterName(selectedCharacterName)}/buildtabs?tabs=all";
 
             var contentResponse = await SendRequestAsync(apiUrl);
-            var builds = JsonSerializer.Deserialize<BuildContainer[]>(contentResponse, new JsonSerializerOptions()
-            {
-#warning ToDo: Replace with JsonSerializerOptions.Web with .NET 9
-                PropertyNameCaseInsensitive = true
-            }) ?? Array.Empty<BuildContainer>();
+            var builds = JsonSerializer.Deserialize<BuildContainer[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<BuildContainer>();
 
             return builds;
         }
