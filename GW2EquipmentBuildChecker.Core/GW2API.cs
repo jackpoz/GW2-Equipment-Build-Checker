@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GW2EquipmentBuildChecker.Core
 {
-    public class API(string apiKey)
+    public class GW2API(string apiKey)
     {
         private const string BaseUrl = "https://api.guildwars2.com/v2";
         private HttpClient Client { get; } = new HttpClient();

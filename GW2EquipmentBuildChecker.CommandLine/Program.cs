@@ -9,7 +9,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
         static async Task Main(string[] args)
         {
             var apiKey = ConfigurationManager.AppSettings["ApiKey"] ?? throw new ArgumentNullException("ApiKey");
-            var api = new API(apiKey);
+            var api = new GW2API(apiKey);
 
             // 1. Get the list of characters
             var characterNames = await api.GetCharactersNames();
