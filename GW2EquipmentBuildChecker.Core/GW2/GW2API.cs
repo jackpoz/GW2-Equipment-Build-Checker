@@ -1,4 +1,4 @@
-﻿using GW2EquipmentBuildChecker.Core.Entities.Characters;
+﻿using GW2EquipmentBuildChecker.Core.GW2.Entities.Characters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,14 +6,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace GW2EquipmentBuildChecker.Core
+namespace GW2EquipmentBuildChecker.Core.GW2
 {
     public class GW2API(string apiKey)
     {
         private const string BaseUrl = "https://api.guildwars2.com/v2";
         private HttpClient Client { get; } = new HttpClient();
 
-        public async Task<string[]> GetCharactersNames()
+        public async Task<string[]> GetCharactersNamesAsync()
         {
             string apiUrl = $"{BaseUrl}/characters";
 
@@ -23,7 +23,7 @@ namespace GW2EquipmentBuildChecker.Core
             return characterNames.Order().ToArray();
         }
 
-        public async Task<BuildContainer[]> GetBuilds(string selectedCharacterName)
+        public async Task<BuildContainer[]> GetBuildsAsync(string selectedCharacterName)
         {
             string apiUrl = $"{BaseUrl}/characters/{EscapeCharacterName(selectedCharacterName)}/buildtabs?tabs=all";
 
@@ -31,6 +31,17 @@ namespace GW2EquipmentBuildChecker.Core
             var builds = JsonSerializer.Deserialize<BuildContainer[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<BuildContainer>();
 
             return builds;
+        }
+
+        internal static async Task<Entities.Specialization[]> GetSpecializationsAsync()
+        {
+            const string apiUrl = $"{BaseUrl}/specializations?ids=all";
+            using var client = new HttpClient();
+            var response = await client.GetAsync(apiUrl);
+            response.EnsureSuccessStatusCode();
+            var contentResponse = await response.Content.ReadAsStringAsync();
+            var specializations = JsonSerializer.Deserialize<Entities.Specialization[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<Entities.Specialization>();
+            return specializations;
         }
 
         private async Task<string?> SendRequestAsync(string apiUrl)

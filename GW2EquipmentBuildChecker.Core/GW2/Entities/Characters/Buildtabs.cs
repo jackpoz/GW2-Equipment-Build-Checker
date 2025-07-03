@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace GW2EquipmentBuildChecker.Core.Entities.Characters
+namespace GW2EquipmentBuildChecker.Core.GW2.Entities.Characters
 {
     public class BuildContainer
     {

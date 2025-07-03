@@ -1,4 +1,5 @@
-﻿using GW2EquipmentBuildChecker.Core;
+﻿using GW2EquipmentBuildChecker.Core.GW2;
+using GW2EquipmentBuildChecker.Core.GW2Skills;
 using System;
 using System.Configuration;
 
@@ -9,10 +10,10 @@ namespace GW2EquipmentBuildChecker.CommandLine
         static async Task Main(string[] args)
         {
             var apiKey = ConfigurationManager.AppSettings["ApiKey"] ?? throw new ArgumentNullException("ApiKey");
-            var api = new GW2API(apiKey);
+            var gw2api = new GW2API(apiKey);
 
             // 1. Get the list of characters
-            var characterNames = await api.GetCharactersNames();
+            var characterNames = await gw2api.GetCharactersNamesAsync();
 
             // 2. Pick 1 character
             Console.WriteLine("Characters list:");
@@ -34,7 +35,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var selectedCharacterName = characterNames[characterChoice - 1];
 
             // 3. Get the list of builds
-            var builds = await api.GetBuilds(selectedCharacterName);
+            var builds = await gw2api.GetBuildsAsync(selectedCharacterName);
 
             // 4. Pick 1 build
             Console.WriteLine("Builds list:");
@@ -54,9 +55,11 @@ namespace GW2EquipmentBuildChecker.CommandLine
                 return;
             }
 
-            var selectedBuild = builds.Where(b => b.Tab == buildChoice).First();
+            var selectedBuild = builds.First(b => b.Tab == buildChoice);
 
             // 5. Get the build from gw2skills
+            var gw2skills = new GW2SkillsAPI();
+            var gw2skillsBuild = await gw2skills.GetBuildAsync("https://en.gw2skills.net/editor/?<buildcode>");
 
             // 6. Compare and find differences
 
