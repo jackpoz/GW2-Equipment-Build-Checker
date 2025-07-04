@@ -1,4 +1,5 @@
-﻿using GW2EquipmentBuildChecker.Core.GW2;
+﻿using GW2EquipmentBuildChecker.Core;
+using GW2EquipmentBuildChecker.Core.GW2;
 using GW2EquipmentBuildChecker.Core.GW2Skills;
 using System;
 using System.Configuration;
@@ -62,8 +63,13 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var gw2skillsBuild = await gw2skills.GetBuildAsync("https://en.gw2skills.net/editor/?<buildcode>");
 
             // 6. Compare and find differences
+            var buildDifferences = BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
 
             // 7. Tell what to change
+            foreach (var difference in buildDifferences)
+            {
+                Console.WriteLine(difference);
+            }
         }
     }
 }

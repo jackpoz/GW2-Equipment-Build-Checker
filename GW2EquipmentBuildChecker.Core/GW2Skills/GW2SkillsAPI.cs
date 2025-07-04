@@ -70,9 +70,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                 Specializations = new List<GW2.Entities.Characters.Specialization>()
             };
 
-            foreach(var trait in gw2SkillBuild.Preload.Trait)
+            var profession = db.Profession.Rows.First(p => p[0].GetInt32() == gw2SkillBuild.Preload.Profession);
+            build.Profession = profession[1].GetString();
+
+            foreach (var trait in gw2SkillBuild.Preload.Trait)
             {
-                var spec = db.Specialization.Rows.Single(s => s[0].GetInt32() == trait[0]);
+                var spec = db.Specialization.Rows.First(s => s[0].GetInt32() == trait[0]);
                 var trait1 = spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[1]).Index;
                 var trait2 = spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[2]).Index;
                 var trait3 = spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[3]).Index;
