@@ -10,7 +10,17 @@ namespace GW2EquipmentBuildChecker.CommandLine
     {
         static async Task Main(string[] args)
         {
-            var apiKey = ConfigurationManager.AppSettings["ApiKey"] ?? throw new ArgumentNullException("ApiKey");
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var apiKey = config.AppSettings.Settings["ApiKey"].Value;
+            while (string.IsNullOrEmpty(apiKey))
+            {
+                Console.WriteLine("Please enter your API key:");
+                apiKey = Console.ReadLine()?.Trim() ?? string.Empty;
+                config.AppSettings.Settings["ApiKey"].Value = apiKey;
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection("appSettings");
+            }
+
             var gw2api = new GW2API(apiKey);
 
             // 1. Get the list of characters
@@ -25,7 +35,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
                 ++characterIndex;
             }
 
-            Console.WriteLine("\nPick a character by writing the number...");
+            Console.WriteLine("\nPick a character by writing the number:");
 
             if (!int.TryParse(Console.ReadLine(), out var characterChoice) && characterChoice > 0 && characterChoice <= characterNames.Length)
             {
@@ -48,7 +58,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
                 Console.WriteLine($"{build.Tab}: {build.Build.Name}");
             }
 
-            Console.WriteLine("\nPick a build by writing the number...");
+            Console.WriteLine("\nPick a build by writing the number:");
 
             if (!int.TryParse(Console.ReadLine(), out var buildChoice) && buildChoice > 0 && buildChoice <= builds.Length)
             {
@@ -59,7 +69,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var selectedBuild = builds.First(b => b.Tab == buildChoice);
 
             // 5. Get the build from gw2skills
-            Console.WriteLine("Past a gw2skills.net link...");
+            Console.WriteLine("Past a gw2skills.net link:");
             var gw2skillsLink = Console.ReadLine()?.Trim();
             if (string.IsNullOrEmpty(gw2skillsLink))
             {
