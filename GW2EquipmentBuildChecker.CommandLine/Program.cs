@@ -59,8 +59,17 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var selectedBuild = builds.First(b => b.Tab == buildChoice);
 
             // 5. Get the build from gw2skills
+            Console.WriteLine("Past a gw2skills.net link...");
+            var gw2skillsLink = Console.ReadLine()?.Trim();
+            if (string.IsNullOrEmpty(gw2skillsLink))
+            {
+                Console.WriteLine("Invalid gw2skills link");
+                return;
+            }
+
             var gw2skills = new GW2SkillsAPI();
-            var gw2skillsBuild = await gw2skills.GetBuildAsync("https://en.gw2skills.net/editor/?<buildcode>");
+
+            var gw2skillsBuild = await gw2skills.GetBuildAsync(gw2skillsLink);
 
             // 6. Compare and find differences
             var buildDifferences = BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
