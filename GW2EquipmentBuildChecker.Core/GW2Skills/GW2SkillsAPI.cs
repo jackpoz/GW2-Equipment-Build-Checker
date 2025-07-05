@@ -74,12 +74,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             foreach (var trait in gw2SkillBuild.Preload.Trait)
             {
                 var spec = db.Specialization.Rows.First(s => s[0].GetInt32() == trait[0]);
-                var trait1 = spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[1]).Index;
-                var trait2 = spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[2]).Index;
-                var trait3 = spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[3]).Index;
+                int? trait1 = trait[1] == 0 ? null : spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[1]).Index;
+                int? trait2 = trait[2] == 0 ? null : spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[2]).Index;
+                int? trait3 = trait[3] == 0 ? null : spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[3]).Index;
 
                 var gw2Spec = GW2API.GetSpecialization(spec[1].GetString());
-                var gw2Traits = new List<int?>() { gw2Spec.Major_Traits[trait1], gw2Spec.Major_Traits[trait2], gw2Spec.Major_Traits[trait3] };
+                var gw2Traits = new List<int?>() { trait1 == null ? null : gw2Spec.Major_Traits[trait1.Value], trait2 == null ? null : gw2Spec.Major_Traits[trait2.Value], trait3 == null ? null : gw2Spec.Major_Traits[trait3.Value] };
 
                 build.Specializations.Add(new GW2.Entities.Characters.Specialization()
                 {
