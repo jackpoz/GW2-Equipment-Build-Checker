@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36203.30 d17.14
+VisualStudioVersion = 17.14.36203.30
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GW2EquipmentBuildChecker.CommandLine", "GW2EquipmentBuildChecker.CommandLine\GW2EquipmentBuildChecker.CommandLine.csproj", "{D700C2FD-64CF-46B2-8F65-FA4E2F373CEF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GW2EquipmentBuildChecker.Core", "GW2EquipmentBuildChecker.Core\GW2EquipmentBuildChecker.Core.csproj", "{B4770A48-77FC-4B47-859E-9BBA060697FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GW2EquipmentBuildChecker.Uno", "GW2EquipmentBuildChecker.Uno\GW2EquipmentBuildChecker.Uno.csproj", "{B93C306A-1E89-C11F-6CB2-0132BC162B7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{B4770A48-77FC-4B47-859E-9BBA060697FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4770A48-77FC-4B47-859E-9BBA060697FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4770A48-77FC-4B47-859E-9BBA060697FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B93C306A-1E89-C11F-6CB2-0132BC162B7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B93C306A-1E89-C11F-6CB2-0132BC162B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B93C306A-1E89-C11F-6CB2-0132BC162B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B93C306A-1E89-C11F-6CB2-0132BC162B7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
