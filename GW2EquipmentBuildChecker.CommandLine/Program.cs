@@ -85,9 +85,16 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var buildDifferences = BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
 
             // 7. Tell what to change
-            foreach (var difference in buildDifferences)
+            if (buildDifferences.Count == 0)
             {
-                Console.WriteLine(difference);
+                Console.WriteLine("No differences found");
+            }
+            else
+            {
+                foreach (var difference in buildDifferences)
+                {
+                    Console.WriteLine(difference);
+                }
             }
         }
     }
