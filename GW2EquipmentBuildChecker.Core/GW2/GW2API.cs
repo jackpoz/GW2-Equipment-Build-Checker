@@ -13,6 +13,15 @@ namespace GW2EquipmentBuildChecker.Core.GW2
         private const string BaseUrl = "https://api.guildwars2.com/v2";
         private HttpClient Client { get; } = new HttpClient();
 
+        public static Entities.Specialization[] Specializations { get; private set; }
+
+        static GW2API()
+        {
+            using var client = new HttpClient();
+
+            Specializations = GetSpecializationsAsync(client).GetAwaiter().GetResult();
+        }
+
         public async Task<string[]> GetCharactersNamesAsync()
         {
             string apiUrl = $"{BaseUrl}/characters";
@@ -33,10 +42,30 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             return builds;
         }
 
-        internal static async Task<Entities.Specialization[]> GetSpecializationsAsync()
+        public static string GetSpecializationName(int? specializationId)
+        {
+            if (specializationId == null)
+                return "<Not set>";
+
+            var specialization = Specializations.First(s => s.Id == specializationId);
+            return specialization.Name;
+        }
+
+        public static Entities.Specialization GetSpecialization(int specializationId)
+        {
+            var specialization = Specializations.First(s => s.Id == specializationId);
+            return specialization;
+        }
+
+        public static Entities.Specialization GetSpecialization(string specializationName)
+        {
+            var specialization = Specializations.First(s => s.Name == specializationName);
+            return specialization;
+        }
+
+        private static async Task<Entities.Specialization[]> GetSpecializationsAsync(HttpClient client)
         {
             const string apiUrl = $"{BaseUrl}/specializations?ids=all";
-            using var client = new HttpClient();
             var response = await client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();

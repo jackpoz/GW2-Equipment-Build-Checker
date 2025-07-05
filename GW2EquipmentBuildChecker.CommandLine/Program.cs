@@ -63,7 +63,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var gw2skillsBuild = await gw2skills.GetBuildAsync("https://en.gw2skills.net/editor/?<buildcode>");
 
             // 6. Compare and find differences
-            var buildDifferences = await BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
+            var buildDifferences = BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
 
             // 7. Tell what to change
             foreach (var difference in buildDifferences)

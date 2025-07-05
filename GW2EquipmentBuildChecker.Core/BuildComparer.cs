@@ -10,7 +10,7 @@ namespace GW2EquipmentBuildChecker.Core
 {
     public static class BuildComparer
     {
-        public static async Task<List<string>> CompareBuilds(Build sourceBuild, Build targetBuild)
+        public static List<string> CompareBuilds(Build sourceBuild, Build targetBuild)
         {
             var differences = new List<string>();
             if (sourceBuild.Profession != targetBuild.Profession)
@@ -24,14 +24,36 @@ namespace GW2EquipmentBuildChecker.Core
                 var diffSourceSpecs = sourceSpecs.Except(targetSpecs);
                 var diffTargetSpecs = targetSpecs.Except(sourceSpecs);
 
-                var gw2Specializations = await GW2API.GetSpecializationsAsync();
-
                 if (diffSourceSpecs.Any() || diffTargetSpecs.Any())
                 {
-                    differences.Add($"Specialization mismatch: gw2skills has '{string.Join(", ", diffTargetSpecs.Select(s => gw2Specializations.First(ss => ss.Id == s).Name))}', GW2 has '{string.Join(", ", diffSourceSpecs.Select(s => gw2Specializations.First(ss => ss.Id == s).Name))}'");
+                    differences.Add($"Specialization mismatch: gw2skills has '{string.Join(", ", diffTargetSpecs.Select(s => GW2API.GetSpecializationName(s)))}', GW2 has '{string.Join(", ", diffSourceSpecs.Select(s => GW2API.GetSpecializationName(s)))}'");
                 }
                 else
                 {
+                    foreach(var sourceSpec in sourceBuild.Specializations)
+                    {
+                        var targetSpec = targetBuild.Specializations.First(s => s.Id == sourceSpec.Id);
+
+                        for (int traitIndex = 0; traitIndex < 3; traitIndex++)
+                        {
+                            if (sourceSpec.Traits[traitIndex] != targetSpec.Traits[traitIndex])
+                            {
+                                var specData = GW2API.GetSpecialization(sourceSpec.Id.Value);
+                                var targetTraitIndexes = new[] {
+                                    specData.GetMajorTraitIndex(targetSpec.Traits[0]) +1,
+                                    specData.GetMajorTraitIndex(targetSpec.Traits[1]) +1,
+                                    specData.GetMajorTraitIndex(targetSpec.Traits[2]) +1,
+                                };
+                                var sourceTraitIndexes = new[] {
+                                    specData.GetMajorTraitIndex(sourceSpec.Traits[0]) +1,
+                                    specData.GetMajorTraitIndex(sourceSpec.Traits[1]) +1,
+                                    specData.GetMajorTraitIndex(sourceSpec.Traits[2]) +1,
+                                };
+                                differences.Add($"Trait mismatch for specialization '{GW2API.GetSpecializationName(sourceSpec.Id)}': gw2skills has '{string.Join("-", targetTraitIndexes)}', GW2 has '{string.Join("-", sourceTraitIndexes)}'");
+                                break;
+                            }
+                        }
+                    }                    
                 }
             }
 

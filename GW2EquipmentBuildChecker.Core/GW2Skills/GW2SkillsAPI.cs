@@ -63,8 +63,6 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             var dbRaw = await SendRequestAsync($"https://en.gw2skills.net/ajax/db/en.{gw2SkillBuild.Dbid}.json");
             var db = JsonSerializer.Deserialize<Db>(dbRaw, JsonSerializerOptions.Web);
 
-            var gw2Specializations = await GW2API.GetSpecializationsAsync();
-
             var build = new Build()
             {
                 Specializations = new List<GW2.Entities.Characters.Specialization>()
@@ -80,7 +78,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                 var trait2 = spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[2]).Index;
                 var trait3 = spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[3]).Index;
 
-                var gw2Spec = gw2Specializations.First(s => s.Name == spec[1].GetString());
+                var gw2Spec = GW2API.GetSpecialization(spec[1].GetString());
                 var gw2Traits = new List<int?>() { gw2Spec.Major_Traits[trait1], gw2Spec.Major_Traits[trait2], gw2Spec.Major_Traits[trait3] };
 
                 build.Specializations.Add(new GW2.Entities.Characters.Specialization()
