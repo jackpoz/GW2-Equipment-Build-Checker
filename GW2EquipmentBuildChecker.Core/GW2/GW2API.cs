@@ -13,14 +13,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2
         private const string BaseUrl = "https://api.guildwars2.com/v2";
         private HttpClient Client { get; } = new HttpClient();
 
-        public static Entities.Specialization[] Specializations { get; private set; }
-
-        static GW2API()
+        public static Entities.Specialization[] Specializations => _specializations.Value;
+        private static readonly Lazy<Entities.Specialization[]> _specializations = new(() =>
         {
             using var client = new HttpClient();
-
-            Specializations = GetSpecializationsAsync(client).GetAwaiter().GetResult();
-        }
+            return GetSpecializationsAsync(client).GetAwaiter().GetResult();
+        });
 
         public async Task<string[]> GetCharactersNamesAsync()
         {
