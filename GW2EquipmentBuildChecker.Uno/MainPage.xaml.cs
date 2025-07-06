@@ -79,4 +79,22 @@ public sealed partial class MainPage : Page
         BuildComboBox.ItemsSource = builds;
         BuildComboBox.Visibility = Visibility.Visible;
     }
+
+    private void BuildComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        DifferencesTextBlock.Visibility = Visibility.Collapsed;
+        DifferencesTextBlock.Text = "";
+
+        if (BuildComboBox.SelectedItem == null)
+        {
+            BuildUrlTextBox.Visibility = Visibility.Collapsed;
+
+            CompareButton.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        BuildUrlTextBox.Visibility = Visibility.Visible;
+
+        CompareButton.Visibility = Visibility.Visible;
+    }
 }

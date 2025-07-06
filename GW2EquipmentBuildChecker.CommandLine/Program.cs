@@ -66,7 +66,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var selectedBuild = builds.First(b => b.Tab == buildChoice);
 
             // 5. Get the build from gw2skills
-            Console.WriteLine("Past a gw2skills.net link:");
+            Console.WriteLine("Paste a gw2skills.net link:");
             var gw2skillsLink = Console.ReadLine()?.Trim();
             if (string.IsNullOrEmpty(gw2skillsLink))
             {

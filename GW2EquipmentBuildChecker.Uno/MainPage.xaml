@@ -37,6 +37,7 @@
         <ComboBox
           Header="Select a build"
           Width="300"
+          SelectionChanged="BuildComboBox_SelectionChanged"
           x:Name="BuildComboBox"
           AutomationProperties.AutomationId="BuildComboBox" />
 
