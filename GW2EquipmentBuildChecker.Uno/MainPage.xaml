@@ -29,12 +29,13 @@
         <ComboBox
           Header="Select a character"
           Width="300"
+          SelectionChanged="CharacterComboBox_SelectionChanged"
           x:Name="CharacterComboBox"
           AutomationProperties.AutomationId="CharacterComboBox" />
 
         <!-- Build Selection -->
         <ComboBox
-          Header="Select Build"
+          Header="Select a build"
           Width="300"
           x:Name="BuildComboBox"
           AutomationProperties.AutomationId="BuildComboBox" />

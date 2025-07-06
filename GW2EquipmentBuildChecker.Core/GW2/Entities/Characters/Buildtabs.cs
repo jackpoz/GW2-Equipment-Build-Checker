@@ -12,6 +12,15 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities.Characters
         public int Tab { get; set; }
         public bool Is_Active { get; set; }
         public Build Build { get; set; }
+
+        public override string ToString()
+        {
+            var name = Build?.Name?.ToString();
+            if (string.IsNullOrEmpty(name))
+                name = $"(Unnamed {Tab})";
+
+            return $"{Tab}: {name}";
+        }
     }
 
     public class Build

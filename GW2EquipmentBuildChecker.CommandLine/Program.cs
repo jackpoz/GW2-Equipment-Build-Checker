@@ -52,10 +52,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             Console.WriteLine("Builds list:");
             foreach (var build in builds)
             {
-                if (string.IsNullOrEmpty(build.Build.Name))
-                    build.Build.Name = $"(Unnamed {build.Tab})";
-
-                Console.WriteLine($"{build.Tab}: {build.Build.Name}");
+                Console.WriteLine(build.ToString());
             }
 
             Console.WriteLine("\nPick a build by writing the number:");
