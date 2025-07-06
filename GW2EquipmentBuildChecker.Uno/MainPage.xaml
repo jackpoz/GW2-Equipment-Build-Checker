@@ -7,10 +7,59 @@
     <Grid>
       <StackPanel
         HorizontalAlignment="Center"
-        VerticalAlignment="Center">
-        <TextBlock AutomationProperties.AutomationId="HelloTextBlock"
-          Text="Hello Uno Platform!"
-          HorizontalAlignment="Center" />
+        VerticalAlignment="Center"
+        Spacing="20">
+        
+        <!-- API Key Input -->
+        <TextBox
+          Header="GW2 API Key"
+          PlaceholderText="Enter your GW2 API key"
+          Width="300"
+          x:Name="ApiKeyTextBox"
+          AutomationProperties.AutomationId="ApiKeyTextBox" />
+
+        <Button
+          Content="Load GW2 characters"
+          Width="300"
+          Click="LoadGW2Button_Click"
+          x:Name="LoadGW2Button"
+          AutomationProperties.AutomationId="LoadGW2Button" />
+
+                <!-- Character Selection Dropdown -->
+        <ComboBox
+          Header="Select Character"
+          Width="300"
+          x:Name="CharacterComboBox"
+          AutomationProperties.AutomationId="CharacterComboBox" />
+
+        <!-- Build Selection -->
+        <ComboBox
+          Header="Select Build"
+          Width="300"
+          x:Name="BuildComboBox"
+          AutomationProperties.AutomationId="BuildComboBox" />
+
+        <!-- GW2Skills.net Build URL Input -->
+        <TextBox
+          Header="GW2Skills.net Build URL"
+          PlaceholderText="Enter the build URL"
+          Width="300"
+          x:Name="BuildUrlTextBox"
+          AutomationProperties.AutomationId="BuildUrlTextBox" />
+
+        <Button
+          Content="Compare GW2 with GW2Skills"
+          Width="300"
+          x:Name="CompareButton"
+          AutomationProperties.AutomationId="CompareButton" />
+
+        <!-- Read-Only Message Text -->
+        <TextBlock
+          Text=""
+          Width="300"
+          TextWrapping="Wrap"
+          x:Name="DifferencesTextBlock"
+          AutomationProperties.AutomationId="DifferencesTextBlock" />
       </StackPanel>
     </Grid>
   </ScrollViewer>
