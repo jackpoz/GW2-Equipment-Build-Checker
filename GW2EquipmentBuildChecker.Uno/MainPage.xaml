@@ -27,7 +27,7 @@
 
                 <!-- Character Selection Dropdown -->
         <ComboBox
-          Header="Select Character"
+          Header="Select a character"
           Width="300"
           x:Name="CharacterComboBox"
           AutomationProperties.AutomationId="CharacterComboBox" />

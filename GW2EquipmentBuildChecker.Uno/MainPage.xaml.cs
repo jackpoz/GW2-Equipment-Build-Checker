@@ -15,10 +15,10 @@ public sealed partial class MainPage : Page
     public void InitialLook()
     {
         CharacterComboBox.Visibility = Visibility.Collapsed;
-        CharacterComboBox.Items.Clear();
+        CharacterComboBox.ItemsSource = null;
 
         BuildComboBox.Visibility = Visibility.Collapsed;
-        BuildComboBox.Items.Clear();
+        BuildComboBox.ItemsSource = null;
 
         BuildUrlTextBox.Visibility = Visibility.Collapsed;
 
@@ -46,7 +46,6 @@ public sealed partial class MainPage : Page
         GW2API = new GW2API(this.ApiKeyTextBox.Text);
 
         var characterNames = await GW2API.GetCharactersNamesAsync();
-        CharacterComboBox.Items.Clear();
         CharacterComboBox.SelectedIndex = -1;
         CharacterComboBox.SelectedValue = null;
         CharacterComboBox.ItemsSource = characterNames;
