@@ -17,7 +17,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
         private static readonly Lazy<Entities.Specialization[]> _specializations = new(() =>
         {
             using var client = new HttpClient();
-            return GetSpecializationsAsync(client).GetAwaiter().GetResult();
+            return Task.Run(() => GetSpecializationsAsync(client)).GetAwaiter().GetResult();
         });
 
         public async Task<string[]> GetCharactersNamesAsync()
