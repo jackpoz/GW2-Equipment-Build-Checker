@@ -7,7 +7,7 @@
     <Grid>
       <StackPanel
         HorizontalAlignment="Center"
-        VerticalAlignment="Center"
+        VerticalAlignment="Top"
         Spacing="20">
         
         <!-- API Key Input -->
