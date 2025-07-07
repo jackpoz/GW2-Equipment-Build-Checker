@@ -23,8 +23,8 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      - run: |
-          dotnet build -c Release
+      - run: dotnet workload install wasm-tools
+      - run: dotnet build -c Release
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
