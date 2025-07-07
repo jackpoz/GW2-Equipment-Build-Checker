@@ -41,10 +41,10 @@
           x:Name="BuildComboBox"
           AutomationProperties.AutomationId="BuildComboBox" />
 
-        <!-- GW2Skills.net Build URL Input -->
+        <!-- GW2Skills.net build URL Input -->
         <TextBox
-          Header="GW2Skills.net Build URL"
-          PlaceholderText="Enter the build URL"
+          Header="GW2Skills.net build URL"
+          PlaceholderText="Enter a build URL"
           Width="300"
           x:Name="BuildUrlTextBox"
           AutomationProperties.AutomationId="BuildUrlTextBox" />
@@ -52,6 +52,7 @@
         <Button
           Content="Compare GW2 with GW2Skills"
           Width="300"
+          Click="CompareButton_Click"
           x:Name="CompareButton"
           AutomationProperties.AutomationId="CompareButton" />
 
