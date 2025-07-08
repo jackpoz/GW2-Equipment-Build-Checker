@@ -79,7 +79,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var gw2skillsBuild = await gw2skills.GetBuildAsync(gw2skillsLink);
 
             // 6. Compare and find differences
-            var buildDifferences = BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
+            var buildDifferences = await BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
 
             // 7. Tell what to change
             if (buildDifferences.Count == 0)

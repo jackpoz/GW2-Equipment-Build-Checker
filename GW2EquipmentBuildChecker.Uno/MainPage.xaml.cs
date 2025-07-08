@@ -123,7 +123,7 @@ public sealed partial class MainPage : Page
         var gw2skillsBuild = await GW2SkillsAPI.GetBuildAsync(BuildUrlTextBox.Text);
 
         // 6. Compare and find differences
-        var buildDifferences = BuildComparer.CompareBuilds(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild);
+        var buildDifferences = await BuildComparer.CompareBuilds(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild);
 
         var differencesText = new StringBuilder();
         // 7. Tell what to change
