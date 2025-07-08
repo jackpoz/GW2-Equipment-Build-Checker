@@ -40,7 +40,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             return build;
         }
 
-        private async Task<string?> SendRequestAsync(string url)
+        private async Task<string> SendRequestAsync(string url)
         {
             if (!string.IsNullOrEmpty(Proxy))
             {

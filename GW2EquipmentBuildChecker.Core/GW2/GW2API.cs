@@ -73,7 +73,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             return specializations;
         }
 
-        private async Task<string?> SendRequestAsync(string apiUrl)
+        private async Task<string> SendRequestAsync(string apiUrl)
         {
             if (apiUrl.Contains('?'))
             {
