@@ -37,7 +37,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
 
             Console.WriteLine("\nPick a character by writing the number:");
 
-            if (!int.TryParse(Console.ReadLine(), out var characterChoice) && characterChoice > 0 && characterChoice <= characterNames.Length)
+            if (!int.TryParse(Console.ReadLine(), out var characterChoice) || characterChoice <= 0 || characterChoice > characterNames.Length)
             {
                 Console.WriteLine("Invalid character choice");
                 return;
@@ -57,7 +57,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
 
             Console.WriteLine("\nPick a build by writing the number:");
 
-            if (!int.TryParse(Console.ReadLine(), out var buildChoice) && buildChoice > 0 && buildChoice <= builds.Length)
+            if (!int.TryParse(Console.ReadLine(), out var buildChoice) || buildChoice <= 0 || buildChoice > builds.Length)
             {
                 Console.WriteLine("Invalid build choice");
                 return;
