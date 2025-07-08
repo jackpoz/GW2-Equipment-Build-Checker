@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "GW2EquipmentBuildChecker.Uno",
+  "display": "standalone",
+  "name": "GW2EquipmentBuildChecker.Uno",
+  "short_name": "GW2EquipmentBuildChecker.Uno",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

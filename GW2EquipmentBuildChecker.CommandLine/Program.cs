@@ -52,10 +52,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             Console.WriteLine("Builds list:");
             foreach (var build in builds)
             {
-                if (string.IsNullOrEmpty(build.Build.Name))
-                    build.Build.Name = $"(Unnamed {build.Tab})";
-
-                Console.WriteLine($"{build.Tab}: {build.Build.Name}");
+                Console.WriteLine(build.ToString());
             }
 
             Console.WriteLine("\nPick a build by writing the number:");
@@ -69,7 +66,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var selectedBuild = builds.First(b => b.Tab == buildChoice);
 
             // 5. Get the build from gw2skills
-            Console.WriteLine("Past a gw2skills.net link:");
+            Console.WriteLine("Paste a gw2skills.net link:");
             var gw2skillsLink = Console.ReadLine()?.Trim();
             if (string.IsNullOrEmpty(gw2skillsLink))
             {
@@ -82,7 +79,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var gw2skillsBuild = await gw2skills.GetBuildAsync(gw2skillsLink);
 
             // 6. Compare and find differences
-            var buildDifferences = BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
+            var buildDifferences = await BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
 
             // 7. Tell what to change
             if (buildDifferences.Count == 0)

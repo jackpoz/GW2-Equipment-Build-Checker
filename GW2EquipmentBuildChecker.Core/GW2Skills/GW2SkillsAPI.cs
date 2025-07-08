@@ -13,9 +13,15 @@ using System.Threading.Tasks;
 
 namespace GW2EquipmentBuildChecker.Core.GW2Skills
 {
-    public class GW2SkillsAPI()
+    public class GW2SkillsAPI
     {
         private HttpClient Client { get; } = new HttpClient();
+        private string Proxy { get; }
+
+        public GW2SkillsAPI(string proxy = null)
+        {
+            Proxy = proxy;
+        }
 
         public async Task<Build> GetBuildAsync(string buildUrl)
         {
@@ -36,6 +42,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
 
         private async Task<string?> SendRequestAsync(string url)
         {
+            if (!string.IsNullOrEmpty(Proxy))
+            {
+                var uri = new Uri(url);
+                url = $"{Proxy}{uri.PathAndQuery}";
+            }
+
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await Client.SendAsync(request);
             response.EnsureSuccessStatusCode();
@@ -78,7 +90,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                 int? trait2 = trait[2] == 0 ? null : spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[2]).Index;
                 int? trait3 = trait[3] == 0 ? null : spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[3]).Index;
 
-                var gw2Spec = GW2API.GetSpecialization(spec[1].GetString());
+                var gw2Spec = await GW2API.GetSpecialization(spec[1].GetString());
                 var gw2Traits = new List<int?>() { trait1 == null ? null : gw2Spec.Major_Traits[trait1.Value], trait2 == null ? null : gw2Spec.Major_Traits[trait2.Value], trait3 == null ? null : gw2Spec.Major_Traits[trait3.Value] };
 
                 build.Specializations.Add(new GW2.Entities.Characters.Specialization()
