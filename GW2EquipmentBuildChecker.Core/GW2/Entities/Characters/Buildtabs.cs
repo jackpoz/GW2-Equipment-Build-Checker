@@ -29,9 +29,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities.Characters
         public string Profession { get; set; }
         public List<Specialization> Specializations { get; set; }
         public SkillSet Skills { get; set; }
-        public SkillSet Aquatic_Skills { get; set; }
-        public List<string?> Legends { get; set; }
-        public List<string> Aquatic_Legends { get; set; }
+        public List<string> Legends { get; set; }
     }
 
     public class Specialization

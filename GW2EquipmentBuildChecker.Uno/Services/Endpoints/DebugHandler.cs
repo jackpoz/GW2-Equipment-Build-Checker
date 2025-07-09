@@ -2,7 +2,7 @@ namespace GW2EquipmentBuildChecker.Uno.Services.Endpoints;
 
 internal class DebugHttpHandler : DelegatingHandler
 {
-    public DebugHttpHandler(HttpMessageHandler? innerHandler = null)
+    public DebugHttpHandler(HttpMessageHandler innerHandler = null)
         : base(innerHandler ?? new HttpClientHandler())
     {
     }

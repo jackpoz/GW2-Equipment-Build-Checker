@@ -14,6 +14,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
         private HttpClient Client { get; } = new HttpClient();
 
         private static Entities.Specialization[] _specializations { get; set; }
+        private static Entities.Skill[] _skills { get; set; }
 
         public async Task<string[]> GetCharactersNamesAsync()
         {
@@ -73,7 +74,39 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             return specializations;
         }
 
-        private async Task<string?> SendRequestAsync(string apiUrl)
+        public static async Task<string> GetSkillName(int? skillId)
+        {
+            if (skillId == null)
+                return "<Not set>";
+
+            var skill = (await GetSkillsAsync()).First(s => s.Id == skillId);
+            return skill.Name;
+        }
+
+        public static async Task<Entities.Skill> GetSkill(string skillName)
+        {
+            var skill = (await GetSkillsAsync()).First(s => s.Name == skillName);
+            return skill;
+        }
+
+        private static async Task<Entities.Skill[]> GetSkillsAsync()
+        {
+            if (_skills != null)
+                return _skills;
+
+            using var client = new HttpClient();
+            const string apiUrl = $"{BaseUrl}/skills?ids=all";
+            var response = await client.GetAsync(apiUrl);
+            response.EnsureSuccessStatusCode();
+            var contentResponse = await response.Content.ReadAsStringAsync();
+            var skills = JsonSerializer.Deserialize<Entities.Skill[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<Entities.Skill>();
+
+            _skills = skills;
+
+            return skills;
+        }
+
+        private async Task<string> SendRequestAsync(string apiUrl)
         {
             if (apiUrl.Contains('?'))
             {

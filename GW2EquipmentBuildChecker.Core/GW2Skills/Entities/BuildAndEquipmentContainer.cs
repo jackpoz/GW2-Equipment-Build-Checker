@@ -32,13 +32,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills.Entities
 
     internal class Skill
     {
-        public SkillSlot[] T { get; set; }
-        public SkillSlot[] A { get; set; }
-    }
-
-    internal class SkillSlot
-    {
-        public Dictionary<string, int> Skills { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int>[] T { get; set; }
     }
 
     internal class Pet

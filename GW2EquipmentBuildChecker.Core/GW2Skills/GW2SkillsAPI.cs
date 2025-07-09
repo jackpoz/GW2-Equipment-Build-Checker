@@ -40,7 +40,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             return build;
         }
 
-        private async Task<string?> SendRequestAsync(string url)
+        private async Task<string> SendRequestAsync(string url)
         {
             if (!string.IsNullOrEmpty(Proxy))
             {
@@ -70,6 +70,21 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             return wip;
         }
 
+        private async Task<SkillContent> GetSkillInfoAsync(int professionId)
+        {
+            var response = await Client.PostAsync("https://en.gw2skills.net/ajax/getSkillInfo/", new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("mode", "4"),
+                new KeyValuePair<string, string>("id", professionId.ToString())
+            }));
+
+            response.EnsureSuccessStatusCode();
+            var contentResponse = await response.Content.ReadAsStringAsync();
+            var parsed = JsonSerializer.Deserialize<SkillsInfoContainer>(contentResponse, JsonSerializerOptions.Web);
+
+            return parsed.Content[0];
+        }
+
         private async Task<Build> ConvertGW2SkillsToGW2API(BuildAndEquipmentContainer gw2SkillBuild)
         {
             var dbRaw = await SendRequestAsync($"https://en.gw2skills.net/ajax/db/en.{gw2SkillBuild.Dbid}.json");
@@ -77,7 +92,8 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
 
             var build = new Build()
             {
-                Specializations = new List<GW2.Entities.Characters.Specialization>()
+                Specializations = new List<GW2.Entities.Characters.Specialization>(),
+                Skills = new SkillSet()
             };
 
             var profession = db.Profession.Rows.First(p => p[0].GetInt32() == gw2SkillBuild.Preload.Profession);
@@ -99,6 +115,18 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                     Traits = gw2Traits
                 });
             }
+
+            var skillsInfo = await GetSkillInfoAsync(gw2SkillBuild.Preload.Profession);
+
+            build.Skills.Heal = (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["6"]))).Id;
+            build.Skills.Utilities = new List<int?>()
+            {
+                 (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["7"]))).Id,
+                 (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["8"]))).Id,
+                 (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["9"]))).Id
+            };
+            build.Skills.Elite = (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["10"]))).Id;
+
 
             return build;
         }
