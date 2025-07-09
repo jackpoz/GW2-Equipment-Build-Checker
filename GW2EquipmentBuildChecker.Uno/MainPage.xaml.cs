@@ -9,7 +9,11 @@ namespace GW2EquipmentBuildChecker.Uno;
 public sealed partial class MainPage : Page
 {
     GW2API GW2API;
+#if __WASM__
+    GW2SkillsAPI GW2SkillsAPI = new GW2SkillsAPI("https://gw2equipmentbuilderchecker-apimgmt.azure-api.net/cors");
+#else
     GW2SkillsAPI GW2SkillsAPI = new GW2SkillsAPI();
+#endif
 
     private bool Processing
     {
