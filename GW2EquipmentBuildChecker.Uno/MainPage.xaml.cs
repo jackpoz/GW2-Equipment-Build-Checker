@@ -15,6 +15,11 @@ public sealed partial class MainPage : Page
     {
         InitializeComponent();
         InitialLook();
+
+        if (ApplicationData.Current.LocalSettings.Values.TryGetValue(nameof(ApiKeyTextBox), out object apiKey))
+        {
+            ApiKeyTextBox.Text = apiKey.ToString();
+        }
     }
 
     private void InitialLook()
@@ -41,7 +46,7 @@ public sealed partial class MainPage : Page
         {
             var dialog = new ContentDialog
             {
-                XamlRoot = this.XamlRoot,
+                XamlRoot = XamlRoot,
                 Title = "API Key Required",
                 Content = "Please enter your GW2 API key.",
                 CloseButtonText = "OK"
@@ -50,7 +55,9 @@ public sealed partial class MainPage : Page
             return;
         }
 
-        GW2API = new GW2API(this.ApiKeyTextBox.Text);
+        ApplicationData.Current.LocalSettings.Values[nameof(ApiKeyTextBox)] = ApiKeyTextBox.Text;
+
+        GW2API = new GW2API(ApiKeyTextBox.Text);
 
         var characterNames = await GW2API.GetCharactersNamesAsync();
         CharacterComboBox.SelectedIndex = -1;
@@ -111,7 +118,7 @@ public sealed partial class MainPage : Page
         {
             var dialog = new ContentDialog
             {
-                XamlRoot = this.XamlRoot,
+                XamlRoot = XamlRoot,
                 Title = "GW2Skills.net Build URL Required",
                 Content = "Please enter a GW2Skills.net build URL.",
                 CloseButtonText = "OK"
