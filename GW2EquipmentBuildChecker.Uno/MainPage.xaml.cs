@@ -11,6 +11,14 @@ public sealed partial class MainPage : Page
     GW2API GW2API;
     GW2SkillsAPI GW2SkillsAPI = new GW2SkillsAPI("https://gw2equipmentbuilderchecker-apimgmt.azure-api.net/cors");
 
+    private bool Loading
+    {
+        set
+        {
+            LoadingPanel.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
+
     public MainPage()
     {
         InitializeComponent();
@@ -36,6 +44,8 @@ public sealed partial class MainPage : Page
 
         DifferencesTextBlock.Visibility = Visibility.Collapsed;
         DifferencesTextBlock.Text = "";
+
+        Loading = false;
     }
 
     private async void LoadGW2Button_Click(object sender, RoutedEventArgs e)
@@ -54,6 +64,8 @@ public sealed partial class MainPage : Page
             await dialog.ShowAsync();
             return;
         }
+
+        using var loader = new Loader(this);
 
         ApplicationData.Current.LocalSettings.Values[nameof(ApiKeyTextBox)] = ApiKeyTextBox.Text;
 
@@ -82,6 +94,8 @@ public sealed partial class MainPage : Page
         {
             return;
         }
+
+        using var loader = new Loader(this);
 
         var selectedCharacterName = CharacterComboBox.SelectedItem.ToString();
         var builds = await GW2API.GetBuildsAsync(selectedCharacterName);
@@ -127,6 +141,8 @@ public sealed partial class MainPage : Page
             return;
         }
 
+        using var loader = new Loader(this);
+
         var gw2skillsBuild = await GW2SkillsAPI.GetBuildAsync(BuildUrlTextBox.Text);
 
         // 6. Compare and find differences
@@ -148,5 +164,21 @@ public sealed partial class MainPage : Page
 
         DifferencesTextBlock.Text = differencesText.ToString();
         DifferencesTextBlock.Visibility = Visibility.Visible;
+    }
+
+    private class Loader : IDisposable
+    {
+        private MainPage _mainPage;
+
+        public Loader(MainPage mainPage)
+        {
+            _mainPage = mainPage;
+            _mainPage.Loading = true;
+        }
+
+        public void Dispose()
+        {
+            _mainPage.Loading = false;
+        }
     }
 }
