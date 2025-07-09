@@ -72,7 +72,14 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
 
         private async Task<SkillContent> GetSkillInfoAsync(int professionId)
         {
-            var response = await Client.PostAsync("https://en.gw2skills.net/ajax/getSkillInfo/", new FormUrlEncodedContent(new[]
+            var url = "https://en.gw2skills.net/ajax/getSkillInfo/";
+            if (!string.IsNullOrEmpty(Proxy))
+            {
+                var uri = new Uri(url);
+                url = $"{Proxy}{uri.PathAndQuery}";
+            }
+
+            var response = await Client.PostAsync(url, new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("mode", "4"),
                 new KeyValuePair<string, string>("id", professionId.ToString())
