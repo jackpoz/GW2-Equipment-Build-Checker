@@ -69,7 +69,7 @@
           HorizontalAlignment="Center"
           VerticalAlignment="Top"
           Spacing="20"
-          x:Name="LoadingPanel">
+          x:Name="ProcessingPanel">
 
           <ProgressRing IsActive="True" />
 

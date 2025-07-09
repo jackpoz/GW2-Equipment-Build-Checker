@@ -11,11 +11,11 @@ public sealed partial class MainPage : Page
     GW2API GW2API;
     GW2SkillsAPI GW2SkillsAPI = new GW2SkillsAPI();
 
-    private bool Loading
+    private bool Processing
     {
         set
         {
-            LoadingPanel.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+            ProcessingPanel.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 
@@ -45,7 +45,7 @@ public sealed partial class MainPage : Page
         DifferencesTextBlock.Visibility = Visibility.Collapsed;
         DifferencesTextBlock.Text = "";
 
-        Loading = false;
+        Processing = false;
     }
 
     private async void LoadGW2Button_Click(object sender, RoutedEventArgs e)
@@ -173,12 +173,12 @@ public sealed partial class MainPage : Page
         public Loader(MainPage mainPage)
         {
             _mainPage = mainPage;
-            _mainPage.Loading = true;
+            _mainPage.Processing = true;
         }
 
         public void Dispose()
         {
-            _mainPage.Loading = false;
+            _mainPage.Processing = false;
         }
     }
 }
