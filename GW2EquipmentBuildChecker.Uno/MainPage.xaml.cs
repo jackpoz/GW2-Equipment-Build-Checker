@@ -163,6 +163,7 @@ public sealed partial class MainPage : Page
             foreach (var difference in buildDifferences)
             {
                 differencesText.AppendLine(difference);
+                differencesText.AppendLine();
             }
         }
 
