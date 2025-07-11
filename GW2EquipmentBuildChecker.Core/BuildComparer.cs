@@ -55,21 +55,34 @@ namespace GW2EquipmentBuildChecker.Core
                         }
                     }
 
-                    if (sourceBuild.Skills.Heal != targetBuild.Skills.Heal)
+                    // Revenants have skills 6-10 set by their legends
+                    if (sourceBuild.Profession == "Revenant")
                     {
-                        differences.Add($"Heal skill mismatch: gw2skills has '{await GW2API.GetSkillName(targetBuild.Skills.Heal)}', GW2 has '{await GW2API.GetSkillName(sourceBuild.Skills.Heal)}'");
+                        var diffSourceLegends = sourceBuild.Legends.Except(targetBuild.Legends);
+                        var diffTargetLegends = targetBuild.Legends.Except(sourceBuild.Legends);
+                        if (diffSourceLegends.Any() || diffTargetLegends.Any())
+                        {
+                            differences.Add($"Legends mismatch: gw2skills has '{string.Join(", ", await Task.WhenAll(diffTargetLegends.Select(async l => (await GW2API.GetLegendById(l)).Name)))}', GW2 has '{string.Join(", ", await Task.WhenAll(diffSourceLegends.Select(async l => (await GW2API.GetLegendById(l)).Name)))}'");
+                        }
                     }
-
-                    var diffSourceSkills = sourceBuild.Skills.Utilities.Except(targetBuild.Skills.Utilities);
-                    var diffTargetSkills = targetBuild.Skills.Utilities.Except(sourceBuild.Skills.Utilities);
-                    if (diffSourceSkills.Any() || diffTargetSkills.Any())
+                    else
                     {
-                        differences.Add($"Utilities skills mismatch: gw2skills has '{string.Join(", ", await Task.WhenAll(diffTargetSkills.Select(async s => await GW2API.GetSkillName(s))))}', GW2 has '{string.Join(", ", await Task.WhenAll(diffSourceSkills.Select(async s => await GW2API.GetSkillName(s))))}'");
-                    }
+                        if (sourceBuild.Skills.Heal != targetBuild.Skills.Heal)
+                        {
+                            differences.Add($"Heal skill mismatch: gw2skills has '{await GW2API.GetSkillName(targetBuild.Skills.Heal)}', GW2 has '{await GW2API.GetSkillName(sourceBuild.Skills.Heal)}'");
+                        }
 
-                    if (sourceBuild.Skills.Elite != targetBuild.Skills.Elite)
-                    {
-                        differences.Add($"Elite skill mismatch: gw2skills has '{await GW2API.GetSkillName(targetBuild.Skills.Elite)}', GW2 has '{await GW2API.GetSkillName(sourceBuild.Skills.Elite)}'");
+                        var diffSourceSkills = sourceBuild.Skills.Utilities.Except(targetBuild.Skills.Utilities);
+                        var diffTargetSkills = targetBuild.Skills.Utilities.Except(sourceBuild.Skills.Utilities);
+                        if (diffSourceSkills.Any() || diffTargetSkills.Any())
+                        {
+                            differences.Add($"Utilities skills mismatch: gw2skills has '{string.Join(", ", await Task.WhenAll(diffTargetSkills.Select(async s => await GW2API.GetSkillName(s))))}', GW2 has '{string.Join(", ", await Task.WhenAll(diffSourceSkills.Select(async s => await GW2API.GetSkillName(s))))}'");
+                        }
+
+                        if (sourceBuild.Skills.Elite != targetBuild.Skills.Elite)
+                        {
+                            differences.Add($"Elite skill mismatch: gw2skills has '{await GW2API.GetSkillName(targetBuild.Skills.Elite)}', GW2 has '{await GW2API.GetSkillName(sourceBuild.Skills.Elite)}'");
+                        }
                     }
                 }
             }

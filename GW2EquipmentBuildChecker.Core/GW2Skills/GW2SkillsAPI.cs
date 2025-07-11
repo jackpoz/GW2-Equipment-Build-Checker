@@ -134,6 +134,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             };
             build.Skills.Elite = (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["10"]))).Id;
 
+            if (build.Profession == "Revenant")
+            {
+                var legend1 = (await GW2API.GetLegendBySkills(build.Skills.Heal.Value, build.Skills.Elite.Value)).Id;
+                var legend2 = (await GW2API.GetLegendBySkills((await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["6"]))).Id, (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["10"]))).Id)).Id;
+                build.Legends = [legend1, legend2];
+            }
 
             return build;
         }
