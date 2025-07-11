@@ -224,9 +224,29 @@ namespace GW2EquipmentBuildChecker.Core.GW2
 
             var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
             var response = await Client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            await EnsureSuccessRequest(response);
             var contentResponse = await response.Content.ReadAsStringAsync();
             return contentResponse;
+        }
+
+        private async Task EnsureSuccessRequest(HttpResponseMessage response)
+        {
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorMessage = null;
+                try
+                {
+                    var contentRaw = await response.Content.ReadAsStringAsync();
+                    var content = JsonSerializer.Deserialize<Dictionary<string, string>>(contentRaw);
+                    errorMessage = content["text"];
+                }
+                catch
+                {
+                    response.EnsureSuccessStatusCode();
+                }
+
+                throw new Exception($"GW2 API error: '{errorMessage}'");
+            }
         }
 
         private string EscapeCharacterName(string characterName)
