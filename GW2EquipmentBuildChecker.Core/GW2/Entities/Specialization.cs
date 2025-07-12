@@ -10,12 +10,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int[] Major_Traits { get; set; }
+        public List<int> Major_Traits { get; set; }
         public int GetMajorTraitIndex(int? traitId)
         {
             if (traitId == null)
                 return -1;
-            return Array.IndexOf(Major_Traits, traitId) % 3;
+            return Major_Traits.IndexOf(traitId.Value) % 3;
         }
     }
 }
