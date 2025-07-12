@@ -54,121 +54,133 @@ public sealed partial class MainPage : Page
 
     private async void LoadGW2Button_Click(object sender, RoutedEventArgs e)
     {
-        InitialLook();
-
-        if (string.IsNullOrEmpty(ApiKeyTextBox.Text))
+        await Utilities.TryExecute(async () =>
         {
-            var dialog = new ContentDialog
+            InitialLook();
+
+            if (string.IsNullOrEmpty(ApiKeyTextBox.Text))
             {
-                XamlRoot = XamlRoot,
-                Title = "API Key Required",
-                Content = "Please enter your GW2 API key.",
-                CloseButtonText = "OK"
-            };
-            await dialog.ShowAsync();
-            return;
-        }
+                var dialog = new ContentDialog
+                {
+                    XamlRoot = XamlRoot,
+                    Title = "API Key Required",
+                    Content = "Please enter your GW2 API key.",
+                    CloseButtonText = "OK"
+                };
+                await dialog.ShowAsync();
+                return;
+            }
 
-        using var loader = new Loader(this);
+            using var loader = new Loader(this);
 
-        ApplicationData.Current.LocalSettings.Values[nameof(ApiKeyTextBox)] = ApiKeyTextBox.Text;
+            ApplicationData.Current.LocalSettings.Values[nameof(ApiKeyTextBox)] = ApiKeyTextBox.Text;
 
-        GW2API = new GW2API(ApiKeyTextBox.Text);
+            GW2API = new GW2API(ApiKeyTextBox.Text);
 
-        var characterNames = await GW2API.GetCharactersNamesAsync();
-        CharacterComboBox.SelectedIndex = -1;
-        CharacterComboBox.SelectedValue = null;
-        CharacterComboBox.ItemsSource = characterNames;
-        CharacterComboBox.Visibility = Visibility.Visible;
+            var characterNames = await GW2API.GetCharactersNamesAsync();
+            CharacterComboBox.SelectedIndex = -1;
+            CharacterComboBox.SelectedValue = null;
+            CharacterComboBox.ItemsSource = characterNames;
+            CharacterComboBox.Visibility = Visibility.Visible;
+        });
     }
 
     private async void CharacterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        BuildComboBox.Visibility = Visibility.Collapsed;
-        BuildComboBox.ItemsSource = null;
-
-        BuildUrlTextBox.Visibility = Visibility.Collapsed;
-
-        CompareButton.Visibility = Visibility.Collapsed;
-
-        DifferencesTextBlock.Visibility = Visibility.Collapsed;
-        DifferencesTextBlock.Text = "";
-
-        if (CharacterComboBox.SelectedItem == null)
+        await Utilities.TryExecute(async () =>
         {
-            return;
-        }
+            BuildComboBox.Visibility = Visibility.Collapsed;
+            BuildComboBox.ItemsSource = null;
 
-        using var loader = new Loader(this);
-
-        var selectedCharacterName = CharacterComboBox.SelectedItem.ToString();
-        var builds = await GW2API.GetBuildsAsync(selectedCharacterName);
-
-        BuildComboBox.SelectedIndex = -1;
-        BuildComboBox.SelectedValue = null;
-        BuildComboBox.ItemsSource = builds;
-        BuildComboBox.Visibility = Visibility.Visible;
-    }
-
-    private void BuildComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        DifferencesTextBlock.Visibility = Visibility.Collapsed;
-        DifferencesTextBlock.Text = "";
-
-        if (BuildComboBox.SelectedItem == null)
-        {
             BuildUrlTextBox.Visibility = Visibility.Collapsed;
 
             CompareButton.Visibility = Visibility.Collapsed;
-            return;
-        }
 
-        BuildUrlTextBox.Visibility = Visibility.Visible;
+            DifferencesTextBlock.Visibility = Visibility.Collapsed;
+            DifferencesTextBlock.Text = "";
 
-        CompareButton.Visibility = Visibility.Visible;
+            if (CharacterComboBox.SelectedItem == null)
+            {
+                return;
+            }
+
+            using var loader = new Loader(this);
+
+            var selectedCharacterName = CharacterComboBox.SelectedItem.ToString();
+            var builds = await GW2API.GetBuildsAsync(selectedCharacterName);
+
+            BuildComboBox.SelectedIndex = -1;
+            BuildComboBox.SelectedValue = null;
+            BuildComboBox.ItemsSource = builds;
+            BuildComboBox.Visibility = Visibility.Visible;
+        });
+    }
+
+    private async void BuildComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        await Utilities.TryExecute(() =>
+        {
+            DifferencesTextBlock.Visibility = Visibility.Collapsed;
+            DifferencesTextBlock.Text = "";
+
+            if (BuildComboBox.SelectedItem == null)
+            {
+                BuildUrlTextBox.Visibility = Visibility.Collapsed;
+
+                CompareButton.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            BuildUrlTextBox.Visibility = Visibility.Visible;
+
+            CompareButton.Visibility = Visibility.Visible;
+        });
     }
 
     private async void CompareButton_Click(object sender, RoutedEventArgs e)
     {
-        DifferencesTextBlock.Visibility = Visibility.Collapsed;
-
-        if (string.IsNullOrEmpty(BuildUrlTextBox.Text))
+        await Utilities.TryExecute(async () =>
         {
-            var dialog = new ContentDialog
+            DifferencesTextBlock.Visibility = Visibility.Collapsed;
+
+            if (string.IsNullOrEmpty(BuildUrlTextBox.Text))
             {
-                XamlRoot = XamlRoot,
-                Title = "GW2Skills.net Build URL Required",
-                Content = "Please enter a GW2Skills.net build URL.",
-                CloseButtonText = "OK"
-            };
-            await dialog.ShowAsync();
-            return;
-        }
-
-        using var loader = new Loader(this);
-
-        var gw2skillsBuild = await GW2SkillsAPI.GetBuildAsync(BuildUrlTextBox.Text);
-
-        // 6. Compare and find differences
-        var buildDifferences = await BuildComparer.CompareBuilds(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild);
-
-        var differencesText = new StringBuilder();
-        // 7. Tell what to change
-        if (buildDifferences.Count == 0)
-        {
-            differencesText.AppendLine("No differences found");
-        }
-        else
-        {
-            foreach (var difference in buildDifferences)
-            {
-                differencesText.AppendLine(difference);
-                differencesText.AppendLine();
+                var dialog = new ContentDialog
+                {
+                    XamlRoot = XamlRoot,
+                    Title = "GW2Skills.net Build URL Required",
+                    Content = "Please enter a GW2Skills.net build URL.",
+                    CloseButtonText = "OK"
+                };
+                await dialog.ShowAsync();
+                return;
             }
-        }
 
-        DifferencesTextBlock.Text = differencesText.ToString();
-        DifferencesTextBlock.Visibility = Visibility.Visible;
+            using var loader = new Loader(this);
+
+            var gw2skillsBuild = await GW2SkillsAPI.GetBuildAsync(BuildUrlTextBox.Text);
+
+            // 6. Compare and find differences
+            var buildDifferences = await BuildComparer.CompareBuilds(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild);
+
+            var differencesText = new StringBuilder();
+            // 7. Tell what to change
+            if (buildDifferences.Count == 0)
+            {
+                differencesText.AppendLine("No differences found");
+            }
+            else
+            {
+                foreach (var difference in buildDifferences)
+                {
+                    differencesText.AppendLine(difference);
+                    differencesText.AppendLine();
+                }
+            }
+
+            DifferencesTextBlock.Text = differencesText.ToString();
+            DifferencesTextBlock.Visibility = Visibility.Visible;
+        });
     }
 
     private class Loader : IDisposable
