@@ -80,6 +80,14 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             }
         }
 
+        public async Task<EquipmentContainer[]> GetEquipmentsAsync(string selectedCharacterName)
+        {
+            string apiUrl = $"{BaseUrl}/characters/{EscapeCharacterName(selectedCharacterName)}/equipmenttabs?tabs=all";
+            var contentResponse = await SendRequestAsync(apiUrl);
+            var equipmentContainers = JsonSerializer.Deserialize<EquipmentContainer[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<EquipmentContainer>();
+            return equipmentContainers;
+        }
+
         public static async Task<string> GetSpecializationName(int? specializationId)
         {
             if (specializationId == null)
