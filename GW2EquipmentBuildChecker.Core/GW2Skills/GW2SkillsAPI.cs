@@ -23,7 +23,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             Proxy = proxy;
         }
 
-        public async Task<Build> GetBuildAsync(string buildUrl)
+        public async Task<(Build build, List<GW2.Entities.Characters.Equipment> equipment)> GetBuildAndEquipmentAsync(string buildUrl)
         {
             var contentResponse = await SendRequestAsync(buildUrl);
 
@@ -35,9 +35,9 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             var json = JavascriptToJson(section);
             var parsed = JsonSerializer.Deserialize<BuildAndEquipmentContainer>(json, JsonSerializerOptions.Web);
 
-            var build = await ConvertGW2SkillsToGW2API(parsed);
+            var (build, equipment) = await ConvertGW2SkillsToGW2API(parsed);
 
-            return build;
+            return (build, equipment);
         }
 
         private async Task<string> SendRequestAsync(string url)
@@ -92,7 +92,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             return parsed.Content[0];
         }
 
-        private async Task<Build> ConvertGW2SkillsToGW2API(BuildAndEquipmentContainer gw2SkillBuild)
+        private async Task<(Build build, List<GW2.Entities.Characters.Equipment> equipment)> ConvertGW2SkillsToGW2API(BuildAndEquipmentContainer gw2SkillBuild)
         {
             var dbRaw = await SendRequestAsync($"https://en.gw2skills.net/ajax/db/en.{gw2SkillBuild.Dbid}.json");
             var db = JsonSerializer.Deserialize<Db>(dbRaw, JsonSerializerOptions.Web);
@@ -141,7 +141,9 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                 build.Legends = [legend1, legend2];
             }
 
-            return build;
+            var equipment = new List<GW2.Entities.Characters.Equipment>();
+
+            return (build, equipment);
         }
     }
 }

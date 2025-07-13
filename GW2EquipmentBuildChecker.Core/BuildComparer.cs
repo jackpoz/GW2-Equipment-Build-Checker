@@ -10,7 +10,7 @@ namespace GW2EquipmentBuildChecker.Core
 {
     public static class BuildComparer
     {
-        public static async Task<List<string>> CompareBuilds(Build sourceBuild, Build targetBuild)
+        public static async Task<List<string>> CompareBuildAndEquipment(Build sourceBuild, Build targetBuild, List<GW2.Entities.Characters.Equipment> sourceEquipment, List<GW2.Entities.Characters.Equipment> targetEquipment)
         {
             var differences = new List<string>();
             if (sourceBuild.Profession != targetBuild.Profession)

@@ -158,10 +158,10 @@ public sealed partial class MainPage : Page
 
             using var loader = new Loader(this);
 
-            var gw2skillsBuild = await GW2SkillsAPI.GetBuildAsync(BuildUrlTextBox.Text);
+            var (gw2skillsBuild, gw2skillsEquipment) = await GW2SkillsAPI.GetBuildAndEquipmentAsync(BuildUrlTextBox.Text);
 
             // 6. Compare and find differences
-            var buildDifferences = await BuildComparer.CompareBuilds(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild);
+            var buildDifferences = await BuildComparer.CompareBuildAndEquipment(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild, null, gw2skillsEquipment);
 
             var differencesText = new StringBuilder();
             // 7. Tell what to change
