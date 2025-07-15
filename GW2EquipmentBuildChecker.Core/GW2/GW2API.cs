@@ -1,5 +1,6 @@
 ﻿using GW2EquipmentBuildChecker.Core.GW2.Entities.Characters;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,8 @@ namespace GW2EquipmentBuildChecker.Core.GW2
         private static Entities.Skill[] _skills { get; set; }
         private static Entities.Legend[] _legends { get; set; }
         private static Entities.ItemStat[] _itemStats { get; set; }
+
+        private static ConcurrentDictionary<int, Entities.Item> _itemsCache { get; } = new ConcurrentDictionary<int, Entities.Item>();
 
         public async Task<string[]> GetCharactersNamesAsync()
         {
@@ -110,6 +113,21 @@ namespace GW2EquipmentBuildChecker.Core.GW2
                                 Name = itemStat.Name
                             };
                         }
+                    }
+
+                    if (equipment.Slot.StartsWith("Weapon"))
+                    {
+                        var item = await GetItemById(equipment.Id);
+                        equipment.Type = item.Details.Type;
+
+                        if (equipment.Type == "Harpoon")
+                        {
+                            equipment.Type = "Spear";
+                        }
+                    }
+                    else
+                    {
+                        equipment.Type = "(Gear)";
                     }
                 }
             }
@@ -280,12 +298,19 @@ namespace GW2EquipmentBuildChecker.Core.GW2
 
         public static async Task<Entities.Item> GetItemById(int itemId)
         {
+            if (_itemsCache.TryGetValue(itemId, out var cachedItem))
+            {
+                return cachedItem;
+            }
+
             using var client = new HttpClient();
             string apiUrl = $"{BaseUrl}/items/{itemId}";
             var response = await client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();
             var item = JsonSerializer.Deserialize<Entities.Item>(contentResponse, JsonSerializerOptions.Web);
+
+            _itemsCache.TryAdd(itemId, item);
             return item;
         }
 

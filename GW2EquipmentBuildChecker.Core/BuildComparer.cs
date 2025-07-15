@@ -110,6 +110,11 @@ namespace GW2EquipmentBuildChecker.Core
                         {
                             differences.Add($"Stats mismatch in slot '{slot}': gw2skills has '{targetItem.Stats.Name}', GW2 has '{sourceItem.Stats?.Name}'");
                         }
+
+                        if (slot.StartsWith("Weapon") && sourceItem.Type != targetItem.Type)
+                        {
+                            differences.Add($"Weapon type mismatch in slot '{slot}': gw2skills has '{targetItem.Type}', GW2 has '{sourceItem.Type}'");
+                        }
                     }
                 }
 

@@ -17,7 +17,6 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities
     public class ItemDetails
     {
         public string Type { get; set; }
-
         public EquipmentStats Infix_Upgrade { get; set; }
     }
 }

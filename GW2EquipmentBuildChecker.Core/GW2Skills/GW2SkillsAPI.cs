@@ -150,14 +150,18 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                 equipmentItems.Add(trinketItem.Key.Replace("earring", "Accessory").Replace("back", "Backpack"), trinketItem.Value);
             }
             (gw2SkillBuild.Preload.Equipment.Trinket).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            gw2SkillBuild.Preload.Equipment.Weapon.W11.Type = GetGW2WeaponTypeFromGW2SkillsId(gw2SkillBuild.Preload.Weapon[0], db);
             equipmentItems.Add("WeaponA1", gw2SkillBuild.Preload.Equipment.Weapon.W11);
+            gw2SkillBuild.Preload.Equipment.Weapon.W21.Type = GetGW2WeaponTypeFromGW2SkillsId(gw2SkillBuild.Preload.Weapon[2], db);
             equipmentItems.Add("WeaponB1", gw2SkillBuild.Preload.Equipment.Weapon.W21);
             if (gw2SkillBuild.Preload.Equipment.Weapon.W12.Item[1] != 0)
             {
+                gw2SkillBuild.Preload.Equipment.Weapon.W12.Type = GetGW2WeaponTypeFromGW2SkillsId(gw2SkillBuild.Preload.Weapon[1], db);
                 equipmentItems.Add("WeaponA2", gw2SkillBuild.Preload.Equipment.Weapon.W12);
             }
             if (gw2SkillBuild.Preload.Equipment.Weapon.W22.Item[1] != 0)
             {
+                gw2SkillBuild.Preload.Equipment.Weapon.W22.Type = GetGW2WeaponTypeFromGW2SkillsId(gw2SkillBuild.Preload.Weapon[3], db);
                 equipmentItems.Add("WeaponB2", gw2SkillBuild.Preload.Equipment.Weapon.W22);
             }
 
@@ -170,10 +174,18 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                     {
                         Name = GetGW2ItemStatNameFromGW2SkillsId(equipmentItemPair.Value.Item[0], db)
                     },
+                    Type = (equipmentItemPair.Value as WeaponEquipmentItem)?.Type ?? "(Gear)"
                 });
             }
 
             return (build, equipment);
+        }
+
+        private string GetGW2WeaponTypeFromGW2SkillsId(int weaponId, Db db)
+        {
+            var weapon = db.Weapon.Rows.First(w => w[0].GetInt32() == weaponId);
+            var weaponType = weapon[2].GetString();
+            return weaponType;
         }
 
         private string GetGW2ItemStatNameFromGW2SkillsId(int itemStatProfileId, Db db)

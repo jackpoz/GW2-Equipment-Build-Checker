@@ -54,10 +54,10 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills.Entities
 
     internal class WeaponSet
     {
-        public EquipmentItem W11 { get; set; }
-        public EquipmentItem W12 { get; set; }
-        public EquipmentItem W21 { get; set; }
-        public EquipmentItem W22 { get; set; }
+        public WeaponEquipmentItem W11 { get; set; }
+        public WeaponEquipmentItem W12 { get; set; }
+        public WeaponEquipmentItem W21 { get; set; }
+        public WeaponEquipmentItem W22 { get; set; }
         public EquipmentItem W31 { get; set; }
         public EquipmentItem W32 { get; set; }
     }
@@ -67,6 +67,11 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills.Entities
         public int[] Item { get; set; }
         public int[][] Up { get; set; }
         public int[] Inf { get; set; }
+    }
+
+    internal class WeaponEquipmentItem : EquipmentItem
+    {
+        public string Type { get; set; }
     }
 
     internal class Buff
