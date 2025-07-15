@@ -44,8 +44,8 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills.Entities
     internal class Equipment
     {
         public WeaponSet Weapon { get; set; }
-        public ArmorSet Armor { get; set; }
-        public TrinketSet Trinket { get; set; }
+        public Dictionary<string, EquipmentItem> Armor { get; set; }
+        public Dictionary<string, EquipmentItem> Trinket { get; set; }
         public Buff Buff { get; set; }
         public int Relic { get; set; }
         public Fractal Fractal { get; set; }
@@ -54,49 +54,15 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills.Entities
 
     internal class WeaponSet
     {
-        public WeaponItem W11 { get; set; }
-        public WeaponItem W12 { get; set; }
-        public WeaponItem W21 { get; set; }
-        public WeaponItem W22 { get; set; }
-        public WeaponItem W31 { get; set; }
-        public WeaponItem W32 { get; set; }
+        public EquipmentItem W11 { get; set; }
+        public EquipmentItem W12 { get; set; }
+        public EquipmentItem W21 { get; set; }
+        public EquipmentItem W22 { get; set; }
+        public EquipmentItem W31 { get; set; }
+        public EquipmentItem W32 { get; set; }
     }
 
-    internal class WeaponItem
-    {
-        public int[] Item { get; set; }
-        public int[][] Up { get; set; }
-        public int[] Inf { get; set; }
-    }
-
-    internal class ArmorSet
-    {
-        public ArmorItem Boots { get; set; }
-        public ArmorItem Leggings { get; set; }
-        public ArmorItem Helm { get; set; }
-        public ArmorItem Coat { get; set; }
-        public ArmorItem Shoulders { get; set; }
-        public ArmorItem Gloves { get; set; }
-    }
-
-    internal class ArmorItem
-    {
-        public int[] Item { get; set; }
-        public int[][] Up { get; set; }
-        public int[] Inf { get; set; }
-    }
-
-    internal class TrinketSet
-    {
-        public TrinketItem Earring1 { get; set; }
-        public TrinketItem Earring2 { get; set; }
-        public TrinketItem Ring1 { get; set; }
-        public TrinketItem Ring2 { get; set; }
-        public TrinketItem Back { get; set; }
-        public TrinketItem Amulet { get; set; }
-    }
-
-    internal class TrinketItem
+    internal class EquipmentItem
     {
         public int[] Item { get; set; }
         public int[][] Up { get; set; }

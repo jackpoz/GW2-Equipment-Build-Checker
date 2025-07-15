@@ -34,5 +34,6 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities.Characters
     public class EquipmentStats
     {
         public int Id { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -107,6 +107,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             }
             else
             {
+                Console.WriteLine();
                 foreach (var difference in buildDifferences)
                 {
                     Console.WriteLine(difference);

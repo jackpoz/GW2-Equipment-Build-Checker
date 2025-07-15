@@ -4,6 +4,7 @@ using GW2EquipmentBuildChecker.Core.GW2Skills.Entities;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text;
@@ -113,7 +114,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                 int? trait2 = trait[2] == 0 ? null : spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[2]).Index;
                 int? trait3 = trait[3] == 0 ? null : spec[7].EnumerateArray().Index().First(t => t.Item.GetInt32() == trait[3]).Index;
 
-                var gw2Spec = await GW2API.GetSpecialization(spec[1].GetString());
+                var gw2Spec = await GW2API.GetSpecializationByName(spec[1].GetString());
                 var gw2Traits = new List<int?>() { trait1 == null ? null : gw2Spec.Major_Traits[trait1.Value], trait2 == null ? null : gw2Spec.Major_Traits[trait2.Value], trait3 == null ? null : gw2Spec.Major_Traits[trait3.Value] };
 
                 build.Specializations.Add(new GW2.Entities.Characters.Specialization()
@@ -125,25 +126,63 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
 
             var skillsInfo = await GetSkillInfoAsync(gw2SkillBuild.Preload.Profession);
 
-            build.Skills.Heal = (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["6"]))).Id;
+            build.Skills.Heal = (await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["6"]))).Id;
             build.Skills.Utilities = new List<int?>()
             {
-                 (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["7"]))).Id,
-                 (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["8"]))).Id,
-                 (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["9"]))).Id
+                 (await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["7"]))).Id,
+                 (await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["8"]))).Id,
+                 (await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["9"]))).Id
             };
-            build.Skills.Elite = (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["10"]))).Id;
+            build.Skills.Elite = (await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["10"]))).Id;
 
             if (build.Profession == "Revenant")
             {
                 var legend1 = (await GW2API.GetLegendBySkills(build.Skills.Heal.Value, build.Skills.Elite.Value)).Id;
-                var legend2 = (await GW2API.GetLegendBySkills((await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["6"]))).Id, (await GW2API.GetSkill(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["10"]))).Id)).Id;
+                var legend2 = (await GW2API.GetLegendBySkills((await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["6"]))).Id, (await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["10"]))).Id)).Id;
                 build.Legends = [legend1, legend2];
             }
 
             var equipment = new List<GW2.Entities.Characters.Equipment>();
 
+            var equipmentItems = new Dictionary<string, EquipmentItem>(gw2SkillBuild.Preload.Equipment.Armor);
+            foreach (var trinketItem in gw2SkillBuild.Preload.Equipment.Trinket)
+            {
+                equipmentItems.Add(trinketItem.Key.Replace("earring", "Accessory").Replace("back", "Backpack"), trinketItem.Value);
+            }
+            (gw2SkillBuild.Preload.Equipment.Trinket).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            equipmentItems.Add("WeaponA1", gw2SkillBuild.Preload.Equipment.Weapon.W11);
+            equipmentItems.Add("WeaponB1", gw2SkillBuild.Preload.Equipment.Weapon.W21);
+            if (gw2SkillBuild.Preload.Equipment.Weapon.W12.Item[1] != 0)
+            {
+                equipmentItems.Add("WeaponA2", gw2SkillBuild.Preload.Equipment.Weapon.W12);
+            }
+            if (gw2SkillBuild.Preload.Equipment.Weapon.W22.Item[1] != 0)
+            {
+                equipmentItems.Add("WeaponB2", gw2SkillBuild.Preload.Equipment.Weapon.W22);
+            }
+
+            foreach (var equipmentItemPair in equipmentItems)
+            {
+                equipment.Add(new GW2.Entities.Characters.Equipment()
+                {
+                    Slot = char.IsUpper(equipmentItemPair.Key[0]) ? equipmentItemPair.Key : CultureInfo.InvariantCulture.TextInfo.ToTitleCase(equipmentItemPair.Key),
+                    Stats = new GW2.Entities.Characters.EquipmentStats()
+                    {
+                        Name = GetGW2ItemStatNameFromGW2SkillsId(equipmentItemPair.Value.Item[0], db)
+                    },
+                });
+            }
+
             return (build, equipment);
+        }
+
+        private string GetGW2ItemStatNameFromGW2SkillsId(int itemStatProfileId, Db db)
+        {
+            var profile = db.Profile.Rows.First(p => p[0].GetInt32() == itemStatProfileId);
+            var profileType = db.PrflType.Rows.First(pt => pt[0].GetInt32() == profile[2].GetInt32());
+            var profileTypeName = profileType[2].GetString();
+            var name = profileTypeName.Replace("+", "and");
+            return name;
         }
     }
 }

@@ -38,7 +38,7 @@ namespace GW2EquipmentBuildChecker.Core
                         {
                             if (sourceSpec.Traits[traitIndex] != targetSpec.Traits[traitIndex])
                             {
-                                var specData = await GW2API.GetSpecialization(sourceSpec.Id.Value);
+                                var specData = await GW2API.GetSpecializationById(sourceSpec.Id.Value);
                                 var targetTraitIndexes = new[] {
                                     specData.GetMajorTraitIndex(targetSpec.Traits[0]) +1,
                                     specData.GetMajorTraitIndex(targetSpec.Traits[1]) +1,
@@ -69,22 +69,51 @@ namespace GW2EquipmentBuildChecker.Core
                     {
                         if (sourceBuild.Skills.Heal != targetBuild.Skills.Heal)
                         {
-                            differences.Add($"Heal skill mismatch: gw2skills has '{await GW2API.GetSkillName(targetBuild.Skills.Heal)}', GW2 has '{await GW2API.GetSkillName(sourceBuild.Skills.Heal)}'");
+                            differences.Add($"Heal skill mismatch: gw2skills has '{await GW2API.GetSkillNameById(targetBuild.Skills.Heal)}', GW2 has '{await GW2API.GetSkillNameById(sourceBuild.Skills.Heal)}'");
                         }
 
                         var diffSourceSkills = sourceBuild.Skills.Utilities.Except(targetBuild.Skills.Utilities);
                         var diffTargetSkills = targetBuild.Skills.Utilities.Except(sourceBuild.Skills.Utilities);
                         if (diffSourceSkills.Any() || diffTargetSkills.Any())
                         {
-                            differences.Add($"Utilities skills mismatch: gw2skills has '{string.Join(", ", await Task.WhenAll(diffTargetSkills.Select(async s => await GW2API.GetSkillName(s))))}', GW2 has '{string.Join(", ", await Task.WhenAll(diffSourceSkills.Select(async s => await GW2API.GetSkillName(s))))}'");
+                            differences.Add($"Utilities skills mismatch: gw2skills has '{string.Join(", ", await Task.WhenAll(diffTargetSkills.Select(async s => await GW2API.GetSkillNameById(s))))}', GW2 has '{string.Join(", ", await Task.WhenAll(diffSourceSkills.Select(async s => await GW2API.GetSkillNameById(s))))}'");
                         }
 
                         if (sourceBuild.Skills.Elite != targetBuild.Skills.Elite)
                         {
-                            differences.Add($"Elite skill mismatch: gw2skills has '{await GW2API.GetSkillName(targetBuild.Skills.Elite)}', GW2 has '{await GW2API.GetSkillName(sourceBuild.Skills.Elite)}'");
+                            differences.Add($"Elite skill mismatch: gw2skills has '{await GW2API.GetSkillNameById(targetBuild.Skills.Elite)}', GW2 has '{await GW2API.GetSkillNameById(sourceBuild.Skills.Elite)}'");
                         }
                     }
                 }
+            }
+
+            if (sourceEquipment != null && targetEquipment != null)
+            {
+                var sourceEquipmentBySlot = sourceEquipment.ToDictionary(e => e.Slot, e => e);
+                var targetEquipmentBySlot = targetEquipment.ToDictionary(e => e.Slot, e => e);
+                foreach (var slot in sourceEquipmentBySlot.Keys.Union(targetEquipmentBySlot.Keys))
+                {
+                    if (!sourceEquipmentBySlot.ContainsKey(slot))
+                    {
+                        differences.Add($"Missing equipment in slot '{slot}' in GW2: {targetEquipmentBySlot[slot]}");
+                    }
+                    else if (!targetEquipmentBySlot.ContainsKey(slot))
+                    {
+                        differences.Add($"Missing equipment in slot '{slot}' in gw2skills: {sourceEquipmentBySlot[slot]}");
+                    }
+                    else
+                    {
+                        var sourceItem = sourceEquipmentBySlot[slot];
+                        var targetItem = targetEquipmentBySlot[slot];
+
+                        if (sourceItem.Stats?.Name != targetItem.Stats.Name)
+                        {
+                            differences.Add($"Stats mismatch in slot '{slot}': gw2skills has '{targetItem.Stats.Name}', GW2 has '{sourceItem.Stats?.Name}'");
+                        }
+                    }
+                }
+
+                differences.Add("Disclaimer: relics cannot be compared due to GW2 API limitations.");
             }
 
             return differences;

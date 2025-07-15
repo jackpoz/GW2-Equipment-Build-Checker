@@ -16,6 +16,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
         private static Entities.Specialization[] _specializations { get; set; }
         private static Entities.Skill[] _skills { get; set; }
         private static Entities.Legend[] _legends { get; set; }
+        private static Entities.ItemStat[] _itemStats { get; set; }
 
         public async Task<string[]> GetCharactersNamesAsync()
         {
@@ -85,6 +86,32 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             string apiUrl = $"{BaseUrl}/characters/{EscapeCharacterName(selectedCharacterName)}/equipmenttabs?tabs=all";
             var contentResponse = await SendRequestAsync(apiUrl);
             var equipmentContainers = JsonSerializer.Deserialize<EquipmentContainer[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<EquipmentContainer>();
+
+            // Skip aquatic weapons as they are not so relevant
+            foreach (var equipmentContainer in equipmentContainers)
+            {
+                equipmentContainer.Equipment.RemoveAll(ec => ec.Slot.Contains("Aquatic"));
+                foreach (var equipment in equipmentContainer.Equipment)
+                {
+                    if (equipment.Stats != null)
+                    {
+                        equipment.Stats.Name = (await GetItemStatById(equipment.Stats.Id)).Name;
+                    }
+                    else
+                    {
+                        // Get the stats name from the item itself
+                        var item = await GetItemById(equipment.Id);
+                        var itemStat = await GetItemStatById(item.Details.Infix_Upgrade.Id);
+                        equipment.Stats = new EquipmentStats
+                        {
+                            Id = itemStat.Id,
+                            Name = itemStat.Name
+                        };
+
+                    }
+                }
+            }
+
             return equipmentContainers;
         }
 
@@ -97,13 +124,13 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             return specialization.Name;
         }
 
-        public static async Task<Entities.Specialization> GetSpecialization(int specializationId)
+        public static async Task<Entities.Specialization> GetSpecializationById(int specializationId)
         {
             var specialization = (await GetSpecializationsAsync()).First(s => s.Id == specializationId);
             return specialization;
         }
 
-        public static async Task<Entities.Specialization> GetSpecialization(string specializationName)
+        public static async Task<Entities.Specialization> GetSpecializationByName(string specializationName)
         {
             var specialization = (await GetSpecializationsAsync()).First(s => s.Name == specializationName);
             return specialization;
@@ -126,7 +153,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             return specializations;
         }
 
-        public static async Task<string> GetSkillName(int? skillId)
+        public static async Task<string> GetSkillNameById(int? skillId)
         {
             if (skillId == null)
                 return "<Not set>";
@@ -135,7 +162,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             return skill.Name;
         }
 
-        public static async Task<Entities.Skill> GetSkill(string skillName)
+        public static async Task<Entities.Skill> GetSkillByName(string skillName)
         {
             var skill = (await GetSkillsAsync()).First(s => s.Name == skillName);
             return skill;
@@ -215,6 +242,45 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             _legends = legends;
 
             return legends;
+        }
+
+        public static async Task<Entities.ItemStat[]> GetItemStatsAsync()
+        {
+            if (_itemStats != null)
+                return _itemStats;
+
+            using var client = new HttpClient();
+            const string apiUrl = $"{BaseUrl}/itemstats?ids=all";
+            var response = await client.GetAsync(apiUrl);
+            response.EnsureSuccessStatusCode();
+            var contentResponse = await response.Content.ReadAsStringAsync();
+            var itemStats = JsonSerializer.Deserialize<Entities.ItemStat[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<Entities.ItemStat>();
+
+            foreach (var itemStat in itemStats)
+            {
+                itemStat.Name = itemStat.Name.Replace("'s", "");
+            }
+
+            _itemStats = itemStats;
+
+            return itemStats;
+        }
+
+        public static async Task<Entities.ItemStat> GetItemStatById(int itemStatId)
+        {
+            var itemStats = await GetItemStatsAsync();
+            return itemStats.First(s => s.Id == itemStatId);
+        }
+
+        public static async Task<Entities.Item> GetItemById(int itemId)
+        {
+            using var client = new HttpClient();
+            string apiUrl = $"{BaseUrl}/items/{itemId}";
+            var response = await client.GetAsync(apiUrl);
+            response.EnsureSuccessStatusCode();
+            var contentResponse = await response.Content.ReadAsStringAsync();
+            var item = JsonSerializer.Deserialize<Entities.Item>(contentResponse, JsonSerializerOptions.Web);
+            return item;
         }
 
         private async Task<string> SendRequestAsync(string apiUrl)
