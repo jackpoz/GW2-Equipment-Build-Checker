@@ -42,6 +42,12 @@
           x:Name="BuildComboBox"
           AutomationProperties.AutomationId="BuildComboBox" />
 
+        <ComboBox
+          Header="Select an equipment tab (optional)"
+          Width="300"
+          x:Name="EquipmentComboBox"
+          AutomationProperties.AutomationId="EquipmentComboBox" />
+
         <!-- GW2Skills.net build URL Input -->
         <TextBox
           Header="GW2Skills.net build URL"
