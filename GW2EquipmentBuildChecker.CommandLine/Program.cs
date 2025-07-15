@@ -49,7 +49,7 @@ namespace GW2EquipmentBuildChecker.CommandLine
             var builds = await gw2api.GetBuildsAsync(selectedCharacterName);
 
             // 4. Pick 1 build
-            Console.WriteLine("Builds list:");
+            Console.WriteLine("\nBuilds list:");
             foreach (var build in builds)
             {
                 Console.WriteLine(build.ToString());
@@ -65,8 +65,27 @@ namespace GW2EquipmentBuildChecker.CommandLine
 
             var selectedBuild = builds.First(b => b.Tab == buildChoice);
 
-            // 5. Get the build from gw2skills
-            Console.WriteLine("Paste a gw2skills.net link:");
+            // 5. Optionally select an equipment tab
+            var equipments = await gw2api.GetEquipmentsAsync(selectedCharacterName);
+
+            Console.WriteLine("\nEquipment list:");
+            foreach (var equipment in equipments)
+            {
+                Console.WriteLine(equipment.ToString());
+            }
+
+            Console.WriteLine("\nPick an equipment by writing the number:");
+
+            if (!int.TryParse(Console.ReadLine(), out var equipmentChoice) || equipmentChoice <= 0 || equipmentChoice > builds.Length)
+            {
+                Console.WriteLine("Invalid equipment choice");
+                return;
+            }
+
+            var selectedEquipment = equipments.First(b => b.Tab == equipmentChoice);
+
+            // 6. Get the build from gw2skills
+            Console.WriteLine("\nPaste a gw2skills.net link:");
             var gw2skillsLink = Console.ReadLine()?.Trim();
             if (string.IsNullOrEmpty(gw2skillsLink))
             {
@@ -76,18 +95,19 @@ namespace GW2EquipmentBuildChecker.CommandLine
 
             var gw2skills = new GW2SkillsAPI();
 
-            var gw2skillsBuild = await gw2skills.GetBuildAsync(gw2skillsLink);
+            var (gw2skillsBuild, gw2skillsEquipment) = await gw2skills.GetBuildAndEquipmentAsync(gw2skillsLink);
 
-            // 6. Compare and find differences
-            var buildDifferences = await BuildComparer.CompareBuilds(selectedBuild.Build, gw2skillsBuild);
+            // 7. Compare and find differences
+            var buildDifferences = await BuildComparer.CompareBuildAndEquipment(selectedBuild.Build, gw2skillsBuild, selectedEquipment.Equipment, gw2skillsEquipment);
 
-            // 7. Tell what to change
+            // 8. Tell what to change
             if (buildDifferences.Count == 0)
             {
-                Console.WriteLine("No differences found");
+                Console.WriteLine("\nNo differences found");
             }
             else
             {
+                Console.WriteLine();
                 foreach (var difference in buildDifferences)
                 {
                     Console.WriteLine(difference);

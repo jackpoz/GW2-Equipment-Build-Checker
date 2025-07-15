@@ -42,6 +42,9 @@ public sealed partial class MainPage : Page
         BuildComboBox.Visibility = Visibility.Collapsed;
         BuildComboBox.ItemsSource = null;
 
+        EquipmentComboBox.Visibility = Visibility.Collapsed;
+        EquipmentComboBox.ItemsSource = null;
+
         BuildUrlTextBox.Visibility = Visibility.Collapsed;
 
         CompareButton.Visibility = Visibility.Collapsed;
@@ -92,6 +95,9 @@ public sealed partial class MainPage : Page
             BuildComboBox.Visibility = Visibility.Collapsed;
             BuildComboBox.ItemsSource = null;
 
+            EquipmentComboBox.Visibility = Visibility.Collapsed;
+            EquipmentComboBox.ItemsSource = null;
+
             BuildUrlTextBox.Visibility = Visibility.Collapsed;
 
             CompareButton.Visibility = Visibility.Collapsed;
@@ -109,10 +115,17 @@ public sealed partial class MainPage : Page
             var selectedCharacterName = CharacterComboBox.SelectedItem.ToString();
             var builds = await GW2API.GetBuildsAsync(selectedCharacterName);
 
+            var equipments = await GW2API.GetEquipmentsAsync(selectedCharacterName);
+
             BuildComboBox.SelectedIndex = -1;
             BuildComboBox.SelectedValue = null;
             BuildComboBox.ItemsSource = builds;
             BuildComboBox.Visibility = Visibility.Visible;
+
+            EquipmentComboBox.SelectedIndex = -1;
+            EquipmentComboBox.SelectedValue = null;
+            EquipmentComboBox.ItemsSource = equipments;
+            EquipmentComboBox.Visibility = Visibility.Visible;
         });
     }
 
@@ -125,11 +138,15 @@ public sealed partial class MainPage : Page
 
             if (BuildComboBox.SelectedItem == null)
             {
+                EquipmentComboBox.Visibility = Visibility.Collapsed;
+
                 BuildUrlTextBox.Visibility = Visibility.Collapsed;
 
                 CompareButton.Visibility = Visibility.Collapsed;
                 return;
             }
+
+            EquipmentComboBox.Visibility = Visibility.Visible;
 
             BuildUrlTextBox.Visibility = Visibility.Visible;
 
@@ -158,10 +175,10 @@ public sealed partial class MainPage : Page
 
             using var loader = new Loader(this);
 
-            var gw2skillsBuild = await GW2SkillsAPI.GetBuildAsync(BuildUrlTextBox.Text);
+            var (gw2skillsBuild, gw2skillsEquipment) = await GW2SkillsAPI.GetBuildAndEquipmentAsync(BuildUrlTextBox.Text);
 
             // 6. Compare and find differences
-            var buildDifferences = await BuildComparer.CompareBuilds(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild);
+            var buildDifferences = await BuildComparer.CompareBuildAndEquipment(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild, ((EquipmentContainer)(EquipmentComboBox.SelectedItem))?.Equipment, gw2skillsEquipment);
 
             var differencesText = new StringBuilder();
             // 7. Tell what to change
