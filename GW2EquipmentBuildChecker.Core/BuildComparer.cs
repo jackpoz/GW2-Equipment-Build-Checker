@@ -113,7 +113,7 @@ namespace GW2EquipmentBuildChecker.Core
                     }
                 }
 
-                differences.Add("Disclaimer: relics cannot be compared due to GW2 API limitations.");
+                differences.Add("Disclaimer: relics and non-legendary items with selectable stats cannot be compared due to GW2 API limitations.");
             }
 
             return differences;

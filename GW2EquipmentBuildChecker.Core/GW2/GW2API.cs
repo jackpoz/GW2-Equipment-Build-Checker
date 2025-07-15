@@ -101,13 +101,15 @@ namespace GW2EquipmentBuildChecker.Core.GW2
                     {
                         // Get the stats name from the item itself
                         var item = await GetItemById(equipment.Id);
-                        var itemStat = await GetItemStatById(item.Details.Infix_Upgrade.Id);
-                        equipment.Stats = new EquipmentStats
+                        if (item.Details?.Infix_Upgrade?.Id != null)
                         {
-                            Id = itemStat.Id,
-                            Name = itemStat.Name
-                        };
-
+                            var itemStat = await GetItemStatById(item.Details.Infix_Upgrade.Id);
+                            equipment.Stats = new EquipmentStats
+                            {
+                                Id = itemStat.Id,
+                                Name = itemStat.Name
+                            };
+                        }
                     }
                 }
             }
