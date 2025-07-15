@@ -300,7 +300,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
                 apiUrl += "?";
             }
 
-            apiUrl += "access_token=" + apiKey;
+            apiUrl += "access_token=" + apiKey + "&nocache=" + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
             var response = await Client.SendAsync(request);
