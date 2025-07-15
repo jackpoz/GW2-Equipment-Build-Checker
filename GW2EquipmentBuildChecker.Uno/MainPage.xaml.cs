@@ -188,6 +188,11 @@ public sealed partial class MainPage : Page
             }
             else
             {
+                if (buildDifferences.Count == 1 && buildDifferences.First().StartsWith("Disclaimer"))
+                {
+                    differencesText.AppendLine("No differences found\n");
+                }
+
                 foreach (var difference in buildDifferences)
                 {
                     differencesText.AppendLine(difference);
