@@ -95,11 +95,11 @@ namespace GW2EquipmentBuildChecker.Core
                 {
                     if (!sourceEquipmentBySlot.ContainsKey(slot))
                     {
-                        differences.Add($"Missing equipment in slot '{slot}' in GW2: {targetEquipmentBySlot[slot]}");
+                        differences.Add($"Missing equipment in slot '{slot}' in GW2");
                     }
                     else if (!targetEquipmentBySlot.ContainsKey(slot))
                     {
-                        differences.Add($"Missing equipment in slot '{slot}' in gw2skills: {sourceEquipmentBySlot[slot]}");
+                        differences.Add($"Missing equipment in slot '{slot}' in gw2skills");
                     }
                     else
                     {

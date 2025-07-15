@@ -261,6 +261,10 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             foreach (var itemStat in itemStats)
             {
                 itemStat.Name = itemStat.Name.Replace("'s", "");
+                if (string.IsNullOrEmpty(itemStat.Name))
+                {
+                    itemStat.Name = "(None)";
+                }
             }
 
             _itemStats = itemStats;
