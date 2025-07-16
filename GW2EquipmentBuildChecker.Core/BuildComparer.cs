@@ -32,7 +32,7 @@ namespace GW2EquipmentBuildChecker.Core
                 {
                     foreach(var sourceSpec in sourceBuild.Specializations)
                     {
-                        var targetSpec = targetBuild.Specializations.First(s => s.Id == sourceSpec.Id);
+                        var targetSpec = targetBuild.Specializations.Single(s => s.Id == sourceSpec.Id);
 
                         for (int traitIndex = 0; traitIndex < 3; traitIndex++)
                         {
@@ -89,39 +89,74 @@ namespace GW2EquipmentBuildChecker.Core
 
             if (sourceEquipment != null && targetEquipment != null)
             {
-                var sourceEquipmentBySlot = sourceEquipment.ToDictionary(e => e.Slot, e => e);
-                var targetEquipmentBySlot = targetEquipment.ToDictionary(e => e.Slot, e => e);
-                foreach (var slot in sourceEquipmentBySlot.Keys.Union(targetEquipmentBySlot.Keys))
+                // Process weapons separately as they could be swapped
+                var sourceEquipmentBySlot = sourceEquipment.Where(e => !e.Slot.StartsWith("Weapon")).ToDictionary(e => e.Slot, e => e);
+                var targetEquipmentBySlot = targetEquipment.Where(e => !e.Slot.StartsWith("Weapon")).ToDictionary(e => e.Slot, e => e);
+                CompareEquipment(differences, sourceEquipmentBySlot, targetEquipmentBySlot);
+
+                var sourceWeapons = sourceEquipment.Where(e => e.Slot.StartsWith("Weapon"));
+                var targetWeapons = targetEquipment.Where(e => e.Slot.StartsWith("Weapon"));
+
+                // Check if weapon slots are swapped and swap them back
+                if (sourceWeapons.Select(w => w.Slot).Except(targetWeapons.Select(w => w.Slot)).Any()
+                    || sourceWeapons.Select(w => new { w.Slot, w.Type }).Except(targetWeapons.Select(w => new { w.Slot, w.Type })).Any())
                 {
-                    if (!sourceEquipmentBySlot.ContainsKey(slot))
-                    {
-                        differences.Add($"Missing equipment in slot '{slot}' in GW2");
-                    }
-                    else if (!targetEquipmentBySlot.ContainsKey(slot))
-                    {
-                        differences.Add($"Missing equipment in slot '{slot}' in gw2skills");
-                    }
-                    else
-                    {
-                        var sourceItem = sourceEquipmentBySlot[slot];
-                        var targetItem = targetEquipmentBySlot[slot];
-
-                        if (sourceItem.Stats?.Name != targetItem.Stats.Name)
-                        {
-                            differences.Add($"Stats mismatch in slot '{slot}': gw2skills has '{targetItem.Stats.Name}', GW2 has '{sourceItem.Stats?.Name}'");
-                        }
-
-                        if (slot.StartsWith("Weapon") && sourceItem.Type != targetItem.Type)
-                        {
-                            differences.Add($"Weapon type mismatch in slot '{slot}': gw2skills has '{targetItem.Type}', GW2 has '{sourceItem.Type}'");
-                        }
-                    }
+                    SwapWeaponsSlot(sourceWeapons, 1);
+                    SwapWeaponsSlot(sourceWeapons, 2);
                 }
+
+                var sourceWeaponsBySlot = sourceWeapons.ToDictionary(e => e.Slot, e => e);
+                var targetWeaponsBySlot = targetWeapons.ToDictionary(e => e.Slot, e => e);
+
+                CompareEquipment(differences, sourceWeaponsBySlot, targetWeaponsBySlot);
 
                 differences.Add("Disclaimer: relics and non-legendary items with selectable stats cannot be compared due to GW2 API limitations.");
             }
 
             return differences;
+        }
+
+        private static void CompareEquipment(List<string> differences, Dictionary<string, Equipment> sourceEquipmentBySlot, Dictionary<string, Equipment> targetEquipmentBySlot)
+        {
+            foreach (var slot in sourceEquipmentBySlot.Keys.Union(targetEquipmentBySlot.Keys))
+            {
+                if (!sourceEquipmentBySlot.TryGetValue(slot, out var sourceItem))
+                {
+                    differences.Add($"Missing equipment in slot '{slot}' in GW2");
+                }
+                else if (!targetEquipmentBySlot.TryGetValue(slot, out var targetItem))
+                {
+                    // No need to log missing equipment in gw2skills
+                }
+                else
+                {
+                    if (sourceItem.Stats?.Name != targetItem.Stats.Name)
+                    {
+                        differences.Add($"Stats mismatch in slot '{slot}': gw2skills has '{targetItem.Stats.Name}', GW2 has '{sourceItem.Stats?.Name}'");
+                    }
+
+                    if (slot.StartsWith("Weapon") && sourceItem.Type != targetItem.Type)
+                    {
+                        differences.Add($"Weapon type mismatch in slot '{slot}': gw2skills has '{targetItem.Type}', GW2 has '{sourceItem.Type}'");
+                    }
+                }
+            }
+        }
+
+        private static void SwapWeaponsSlot(IEnumerable<Equipment> weapons, int slot)
+        {
+            var weaponA = weapons.SingleOrDefault(w => w.Slot == $"WeaponA{slot}");
+            var weaponB = weapons.SingleOrDefault(w => w.Slot == $"WeaponB{slot}");
+
+            if (weaponA != null)
+            {
+                weaponA.Slot = $"WeaponB{slot}";
+            }
+
+            if (weaponB != null)
+            {
+                weaponB.Slot = $"WeaponA{slot}";
+            }
         }
     }
 }

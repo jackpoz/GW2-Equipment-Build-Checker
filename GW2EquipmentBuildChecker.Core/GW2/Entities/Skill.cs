@@ -10,5 +10,6 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public int? Flip_Skill { get; set; }
     }
 }
