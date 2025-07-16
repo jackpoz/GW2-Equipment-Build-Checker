@@ -132,7 +132,7 @@ namespace GW2EquipmentBuildChecker.Core
                 {
                     if (sourceItem.Stats?.Name != targetItem.Stats.Name)
                     {
-                        differences.Add($"Stats mismatch in slot '{slot}': gw2skills has '{targetItem.Stats.Name}', GW2 has '{sourceItem.Stats?.Name}'");
+                        differences.Add($"Stats mismatch in slot '{slot}{(slot.StartsWith("Weapon") ? " (" + targetItem.Type + ")" : "")}': gw2skills has '{targetItem.Stats.Name}', GW2 has '{sourceItem.Stats?.Name}'");
                     }
 
                     if (slot.StartsWith("Weapon") && sourceItem.Type != targetItem.Type)
