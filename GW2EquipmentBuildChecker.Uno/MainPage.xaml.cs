@@ -115,7 +115,13 @@ public sealed partial class MainPage : Page
             var selectedCharacterName = CharacterComboBox.SelectedItem.ToString();
             var builds = await GW2API.GetBuildsAsync(selectedCharacterName);
 
-            var equipments = await GW2API.GetEquipmentsAsync(selectedCharacterName);
+            var equipments = new List<EquipmentContainer>(await GW2API.GetEquipmentsAsync(selectedCharacterName));
+            equipments.Insert(0, new EquipmentContainer
+            {
+                Tab = 0,
+                Name = "(No Equipment)",
+                Equipment = null
+            });
 
             BuildComboBox.SelectedIndex = -1;
             BuildComboBox.SelectedValue = null;
