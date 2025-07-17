@@ -174,7 +174,14 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                     {
                         Name = GetGW2ItemStatNameFromGW2SkillsId(equipmentItemPair.Value.Item[0], db)
                     },
-                    Type = (equipmentItemPair.Value as WeaponEquipmentItem)?.Type ?? "(Gear)"
+                    Type = (equipmentItemPair.Value as WeaponEquipmentItem)?.Type ?? "(Gear)",
+                    UpgradeNames = [.. equipmentItemPair.Value.Up.SelectMany(u1 => u1.Where(u2 => u2 != 0).Select(u2 =>
+                    {
+                        var upgrade = db.Upgrade.Rows.First(u => u[0].GetInt32() == u2);
+                        var upgradeType = db.Uptype.Rows.First(ut => ut[0].GetInt32() == upgrade[3].GetInt32());
+                        var upgradeRarity = db.Rarity.Rows.First(r => r[0].GetInt32() == upgrade[2].GetInt32());
+                        return $"{(upgradeRarity[2].GetString() == "Exotic" ? "Superior " : "")}{upgradeType[2].GetString()} of {upgrade[4].GetString()}";
+                    }))]
                 });
             }
 

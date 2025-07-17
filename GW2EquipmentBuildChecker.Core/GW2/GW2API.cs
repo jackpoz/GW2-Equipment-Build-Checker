@@ -28,7 +28,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             var contentResponse = await SendRequestAsync(apiUrl);
             var characterNames = JsonSerializer.Deserialize<string[]>(contentResponse) ?? Array.Empty<string>();
 
-            return characterNames.Order().ToArray();
+            return [..characterNames.Order()];
         }
 
         public async Task<BuildContainer[]> GetBuildsAsync(string selectedCharacterName)
@@ -129,6 +129,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2
                     {
                         equipment.Type = "(Gear)";
                     }
+
+                    equipment.UpgradeNames = [.. (await Task.WhenAll(equipment.Upgrades.Select(async itemId =>
+                    {
+                        var item = await GetItemById(itemId);
+                        return item.Name;
+                    })))];
                 }
             }
 
@@ -245,7 +251,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             }
 
             // Add missing legends. Vindicator has 2 sets of skills
-            legends = legends.Append(new Entities.Legend
+            legends = [..legends.Append(new Entities.Legend
             {
                 Id = "Legend7",
                 Name = "Vindicator",
@@ -257,7 +263,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
                 Name = "Vindicator",
                 Heal = 62680,
                 Elite = 62687
-            }).ToArray();
+            })];
 
             _legends = legends;
 

@@ -27,6 +27,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities.Characters
         public int Id { get; set; }
         public string Slot { get; set; }
         public List<int> Upgrades { get; set; } = new List<int>();
+        public List<string> UpgradeNames { get; set; } = new List<string>();
         public List<int> Infusions { get; set; } = new List<int>();
         public EquipmentStats Stats { get; set; }
         public string Type { get; set; }

@@ -10,9 +10,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills.Entities
     internal class Db
     {
         public DbRows Profession { get; set; }
-        public DbRows Specialization { get; set; }
-        public DbRows Profile { get; set; }
         public DbRows PrflType { get; set; }
+        public DbRows Profile { get; set; }
+        public DbRows Rarity { get; set; }
+        public DbRows Specialization { get; set; }
+        public DbRows Upgrade { get; set; }
+        public DbRows Uptype { get; set; }
         public DbRows Weapon { get; set; }
     }
 

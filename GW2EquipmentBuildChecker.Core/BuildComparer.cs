@@ -139,6 +139,13 @@ namespace GW2EquipmentBuildChecker.Core
                     {
                         differences.Add($"Weapon type mismatch in slot '{slot}': gw2skills has '{targetItem.Type}', GW2 has '{sourceItem.Type}'");
                     }
+
+                    var diffSourceUpgrades = sourceItem.UpgradeNames.Except(targetItem.UpgradeNames);
+                    var diffTargetUpgrades = targetItem.UpgradeNames.Except(sourceItem.UpgradeNames);
+                    if (diffSourceUpgrades.Any() || diffTargetUpgrades.Any())
+                    {
+                        differences.Add($"Upgrade mismatch in slot '{slot}{(slot.StartsWith("Weapon") ? " (" + targetItem.Type + ")" : "")}': gw2skills has '{string.Join(", ", diffTargetUpgrades)}', GW2 has '{string.Join(", ", diffSourceUpgrades)}'");
+                    }
                 }
             }
         }
