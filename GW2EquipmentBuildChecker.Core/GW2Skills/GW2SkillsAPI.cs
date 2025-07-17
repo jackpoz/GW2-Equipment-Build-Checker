@@ -151,6 +151,17 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             }
             (gw2SkillBuild.Preload.Equipment.Trinket).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             gw2SkillBuild.Preload.Equipment.Weapon.W11.Type = GetGW2WeaponTypeFromGW2SkillsId(gw2SkillBuild.Preload.Weapon[0], db);
+
+            // GW2Skills has both sigils in weapon 1 even if one handed, so remove one if there's a weapon on 2
+            if (gw2SkillBuild.Preload.Equipment.Weapon.W12.Item[1] != 0)
+            {
+                gw2SkillBuild.Preload.Equipment.Weapon.W11.Up = [.. gw2SkillBuild.Preload.Equipment.Weapon.W11.Up.Take(1)];
+            }
+            if (gw2SkillBuild.Preload.Equipment.Weapon.W22.Item[1] != 0)
+            {
+                gw2SkillBuild.Preload.Equipment.Weapon.W21.Up = [.. gw2SkillBuild.Preload.Equipment.Weapon.W21.Up.Take(1)];
+            }
+
             equipmentItems.Add("WeaponA1", gw2SkillBuild.Preload.Equipment.Weapon.W11);
             gw2SkillBuild.Preload.Equipment.Weapon.W21.Type = GetGW2WeaponTypeFromGW2SkillsId(gw2SkillBuild.Preload.Weapon[2], db);
             equipmentItems.Add("WeaponB1", gw2SkillBuild.Preload.Equipment.Weapon.W21);
