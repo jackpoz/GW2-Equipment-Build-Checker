@@ -149,6 +149,17 @@ namespace GW2EquipmentBuildChecker.Core
                     {
                         differences.Add($"Upgrade mismatch in slot '{slot}{(slot.StartsWith("Weapon") ? " (" + targetItem.Type + ")" : "")}': gw2skills has '{string.Join(", ", diffTargetUpgrades)}', GW2 has '{string.Join(", ", diffSourceUpgrades)}'");
                     }
+
+                    // Ignore amulet infusions as they are personal preference
+                    if (slot != "Amulet")
+                    {
+                        var diffSourceInfusions = sourceItem.InfusionNames.Except(targetItem.InfusionNames);
+                        var diffTargetInfusions = targetItem.InfusionNames.Except(sourceItem.InfusionNames);
+                        if (diffSourceInfusions.Any() || diffTargetInfusions.Any())
+                        {
+                            differences.Add($"Infusion mismatch in slot '{slot}{(slot.StartsWith("Weapon") ? " (" + targetItem.Type + ")" : "")}': gw2skills has '{string.Join(", ", diffTargetInfusions)}', GW2 has '{string.Join(", ", diffSourceInfusions)}'");
+                        }
+                    }
                 }
             }
         }

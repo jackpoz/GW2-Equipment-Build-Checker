@@ -135,6 +135,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2
                         var item = await GetItemById(itemId);
                         return item.Name;
                     })))];
+
+                    equipment.InfusionNames = [.. (await Task.WhenAll(equipment.Infusions.Select(async itemId =>
+                    {
+                        var item = await GetItemById(itemId);
+                        return item.Name;
+                    })))];
                 }
             }
 

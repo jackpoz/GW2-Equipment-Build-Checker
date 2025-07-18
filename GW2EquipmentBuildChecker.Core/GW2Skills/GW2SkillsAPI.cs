@@ -156,10 +156,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             if (gw2SkillBuild.Preload.Equipment.Weapon.W12.Item[1] != 0)
             {
                 gw2SkillBuild.Preload.Equipment.Weapon.W11.Up = [.. gw2SkillBuild.Preload.Equipment.Weapon.W11.Up.Take(1)];
+                gw2SkillBuild.Preload.Equipment.Weapon.W11.Inf = [.. gw2SkillBuild.Preload.Equipment.Weapon.W11.Inf.Take(1)];
             }
             if (gw2SkillBuild.Preload.Equipment.Weapon.W22.Item[1] != 0)
             {
                 gw2SkillBuild.Preload.Equipment.Weapon.W21.Up = [.. gw2SkillBuild.Preload.Equipment.Weapon.W21.Up.Take(1)];
+                gw2SkillBuild.Preload.Equipment.Weapon.W21.Inf = [.. gw2SkillBuild.Preload.Equipment.Weapon.W21.Inf.Take(1)];
             }
 
             equipmentItems.Add("WeaponA1", gw2SkillBuild.Preload.Equipment.Weapon.W11);
@@ -192,7 +194,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                         var upgradeType = db.Uptype.Rows.First(ut => ut[0].GetInt32() == upgrade[3].GetInt32());
                         var upgradeRarity = db.Rarity.Rows.First(r => r[0].GetInt32() == upgrade[2].GetInt32());
                         return $"{(upgradeRarity[2].GetString() == "Exotic" ? "Superior " : "")}{upgradeType[2].GetString()} of {upgrade[4].GetString()}";
-                    }))]
+                    }))],
+                    InfusionNames = [.. equipmentItemPair.Value.Inf.Where(i1 => i1 != 0).Select(i1 =>
+                    {
+                        var infusion = db.Upgrade.Rows.First(i => i[0].GetInt32() == i1);
+                        return infusion[4].GetString();
+                    })]
                 });
             }
 
