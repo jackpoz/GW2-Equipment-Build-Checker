@@ -105,6 +105,9 @@ namespace GW2EquipmentBuildChecker.Core
                     SwapWeaponsSlot(sourceWeapons, 2);
                 }
 
+                // Check if weapon sigils are swapped and swap them back
+                CompareAndSwapSigils(sourceWeapons, targetWeapons);
+
                 var sourceWeaponsBySlot = sourceWeapons.ToDictionary(e => e.Slot, e => e);
                 var targetWeaponsBySlot = targetWeapons.ToDictionary(e => e.Slot, e => e);
 
@@ -163,6 +166,32 @@ namespace GW2EquipmentBuildChecker.Core
             if (weaponB != null)
             {
                 weaponB.Slot = $"WeaponA{slot}";
+            }
+        }
+
+        private static void CompareAndSwapSigils(IEnumerable<Equipment> sourceWeapons, IEnumerable<Equipment> targetWeapons)
+        {
+            foreach (var sourceWeapon in sourceWeapons)
+            {
+                var targetWeapon = targetWeapons.SingleOrDefault(tw => tw.Slot == sourceWeapon.Slot && !tw.UpgradeNames.Order().SequenceEqual(sourceWeapon.UpgradeNames.Order()));
+                if (targetWeapon != null)
+                {
+                    // Get the other weapon in the same set if any
+                    var otherSourceWeapon = sourceWeapons.SingleOrDefault(sw => sw.Slot == $"{sourceWeapon.Slot.Substring(0, sourceWeapon.Slot.Length - 1)}{(sourceWeapon.Slot[^1] == '1' ? "2" : "1")}");
+
+                    // Swap sigils if the other weapon has the target one
+                    if (otherSourceWeapon != null && otherSourceWeapon.UpgradeNames.Order().SequenceEqual(targetWeapon.UpgradeNames.Order()))
+                    {
+                        var sourceUpgrades = sourceWeapon.Upgrades;
+                        var sourceUpgradeNames = sourceWeapon.UpgradeNames;
+
+                        sourceWeapon.Upgrades = otherSourceWeapon.Upgrades;
+                        sourceWeapon.UpgradeNames = otherSourceWeapon.UpgradeNames;
+
+                        otherSourceWeapon.Upgrades = sourceUpgrades;
+                        otherSourceWeapon.UpgradeNames = sourceUpgradeNames;
+                    }
+                }
             }
         }
     }
