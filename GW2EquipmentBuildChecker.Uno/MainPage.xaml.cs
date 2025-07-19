@@ -115,8 +115,8 @@ public sealed partial class MainPage : Page
             var selectedCharacterName = CharacterComboBox.SelectedItem.ToString();
             var builds = await GW2API.GetBuildsAsync(selectedCharacterName);
 
-            var equipments = new List<EquipmentContainer>(await GW2API.GetEquipmentsAsync(selectedCharacterName));
-            equipments.Insert(0, new EquipmentContainer
+            var equipments = new List<EquipmentTab>(await GW2API.GetEquipmentsAsync(selectedCharacterName));
+            equipments.Insert(0, new EquipmentTab
             {
                 Tab = 0,
                 Name = "(No Equipment)",
@@ -184,7 +184,7 @@ public sealed partial class MainPage : Page
             var (gw2skillsBuild, gw2skillsEquipment) = await GW2SkillsAPI.GetBuildAndEquipmentAsync(BuildUrlTextBox.Text);
 
             // 6. Compare and find differences
-            var buildDifferences = await BuildComparer.CompareBuildAndEquipment(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild, ((EquipmentContainer)(EquipmentComboBox.SelectedItem))?.Equipment, gw2skillsEquipment);
+            var buildDifferences = await BuildComparer.CompareBuildAndEquipment(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild, ((EquipmentTab)(EquipmentComboBox.SelectedItem))?.Equipment, gw2skillsEquipment);
 
             var differencesText = new StringBuilder();
             // 7. Tell what to change

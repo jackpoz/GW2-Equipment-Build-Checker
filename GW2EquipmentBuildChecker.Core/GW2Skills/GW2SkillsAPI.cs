@@ -180,7 +180,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
 
             foreach (var equipmentItemPair in equipmentItems)
             {
-                equipment.Add(new GW2.Entities.Characters.Equipment()
+                equipment.Add(new GW2.Entities.Characters.Equipment
                 {
                     Slot = char.IsUpper(equipmentItemPair.Key[0]) ? equipmentItemPair.Key : CultureInfo.InvariantCulture.TextInfo.ToTitleCase(equipmentItemPair.Key),
                     Stats = new GW2.Entities.Characters.EquipmentStats()
@@ -200,6 +200,16 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
                         var infusion = db.Upgrade.Rows.First(i => i[0].GetInt32() == i1);
                         return infusion[4].GetString();
                     })]
+                });
+            }
+
+            if (gw2SkillBuild.Preload.Equipment.Relic != 0)
+            {
+                equipment.Add(new GW2.Entities.Characters.Equipment
+                {
+                    Name = db.Upgrade.Rows.First(u => u[0].GetInt32() == gw2SkillBuild.Preload.Equipment.Relic)[4].GetString(),
+                    Slot = "Relic",
+                    Type = "(Gear)"
                 });
             }
 

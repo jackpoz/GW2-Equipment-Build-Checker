@@ -113,7 +113,7 @@ namespace GW2EquipmentBuildChecker.Core
 
                 CompareEquipment(differences, sourceWeaponsBySlot, targetWeaponsBySlot);
 
-                differences.Add("Disclaimer: relics and non-legendary items with selectable stats cannot be compared due to GW2 API limitations.");
+                differences.Add("Disclaimer: non-legendary items with selectable stats cannot be compared due to GW2 API limitations. Only relics from the active equipment template can be compared.");
             }
 
             return differences;
@@ -125,7 +125,11 @@ namespace GW2EquipmentBuildChecker.Core
             {
                 if (!sourceEquipmentBySlot.TryGetValue(slot, out var sourceItem))
                 {
-                    differences.Add($"Missing equipment in slot '{slot}' in GW2");
+                    // Skip relics as GW2 API limitation means only active builds include it
+                    if (slot != "Relic")
+                    {
+                        differences.Add($"Missing equipment in slot '{slot}' in GW2");
+                    }
                 }
                 else if (!targetEquipmentBySlot.TryGetValue(slot, out var targetItem))
                 {
@@ -133,6 +137,15 @@ namespace GW2EquipmentBuildChecker.Core
                 }
                 else
                 {
+                    if (slot == "Relic")
+                    {
+                        if (sourceItem.Name != targetItem.Name)
+                        {
+                            differences.Add($"Relic mismatch: gw2skills has '{targetItem.Name}', GW2 has '{sourceItem.Name}'");
+                            continue;
+                        }
+                    }
+
                     if (sourceItem.Stats?.Name != targetItem.Stats.Name)
                     {
                         differences.Add($"Stats mismatch in slot '{slot}{(slot.StartsWith("Weapon") ? " (" + targetItem.Type + ")" : "")}': gw2skills has '{targetItem.Stats.Name}', GW2 has '{sourceItem.Stats?.Name}'");

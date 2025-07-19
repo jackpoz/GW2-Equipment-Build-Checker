@@ -84,14 +84,14 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             }
         }
 
-        public async Task<EquipmentContainer[]> GetEquipmentsAsync(string selectedCharacterName)
+        public async Task<EquipmentTab[]> GetEquipmentsAsync(string selectedCharacterName)
         {
             string apiUrl = $"{BaseUrl}/characters/{EscapeCharacterName(selectedCharacterName)}/equipmenttabs?tabs=all";
             var contentResponse = await SendRequestAsync(apiUrl);
-            var equipmentContainers = JsonSerializer.Deserialize<EquipmentContainer[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<EquipmentContainer>();
+            var equipmentTabs = JsonSerializer.Deserialize<EquipmentTab[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<EquipmentTab>();
 
             // Skip aquatic weapons as they are not so relevant
-            foreach (var equipmentContainer in equipmentContainers)
+            foreach (var equipmentContainer in equipmentTabs)
             {
                 equipmentContainer.Equipment.RemoveAll(ec => ec.Slot.Contains("Aquatic"));
                 foreach (var equipment in equipmentContainer.Equipment)
@@ -142,9 +142,29 @@ namespace GW2EquipmentBuildChecker.Core.GW2
                         return item.Name;
                     })))];
                 }
+
+                if (equipmentContainer.Is_Active)
+                {
+                    // Get the relic from the active equipment
+                    var apiUrlEquip = $"{BaseUrl}/characters/{EscapeCharacterName(selectedCharacterName)}/equipment";
+                    var contentResponseEquip = await SendRequestAsync(apiUrlEquip);
+                    var activeEquipmentTab = JsonSerializer.Deserialize<EquipmentTab>(contentResponseEquip, JsonSerializerOptions.Web);
+                    var relic = activeEquipmentTab?.Equipment.SingleOrDefault(e => e.Slot == "Relic");
+                    if (relic != null)
+                    {
+                        var relicItem = await GetItemById(relic.Id);
+                        equipmentContainer.Equipment.Add(new Equipment
+                        {
+                            Id = relic.Id,
+                            Name = relicItem.Name,
+                            Slot = relic.Slot,
+                            Type = "(Gear)"
+                        });
+                    }
+                }
             }
 
-            return equipmentContainers;
+            return equipmentTabs;
         }
 
         public static async Task<string> GetSpecializationName(int? specializationId)

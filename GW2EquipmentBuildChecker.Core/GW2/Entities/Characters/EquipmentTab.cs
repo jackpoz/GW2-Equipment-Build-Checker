@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GW2EquipmentBuildChecker.Core.GW2.Entities.Characters
 {
-    public class EquipmentContainer
+    public class EquipmentTab
     {
         public int Tab { get; set; }
         public string Name { get; set; }
@@ -25,6 +25,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities.Characters
     public class Equipment
     {
         public int Id { get; set; }
+        public string Name { get; set; }
         public string Slot { get; set; }
         public List<int> Upgrades { get; set; } = new List<int>();
         public List<string> UpgradeNames { get; set; } = new List<string>();
