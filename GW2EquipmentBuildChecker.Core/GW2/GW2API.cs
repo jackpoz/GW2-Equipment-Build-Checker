@@ -12,7 +12,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
     public class GW2API(string apiKey)
     {
         private const string BaseUrl = "https://api.guildwars2.com/v2";
-        private HttpClient Client { get; } = new HttpClient();
+        private static HttpClient Client { get; } = new HttpClient();
 
         private static Entities.Specialization[] _specializations { get; set; }
         private static Entities.Skill[] _skills { get; set; }
@@ -193,9 +193,8 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             if (_specializations != null)
                 return _specializations;
 
-            using var client = new HttpClient();
             const string apiUrl = $"{BaseUrl}/specializations?ids=all";
-            var response = await client.GetAsync(apiUrl);
+            var response = await Client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();
             var specializations = JsonSerializer.Deserialize<Entities.Specialization[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<Entities.Specialization>();
@@ -225,9 +224,8 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             if (_skills != null)
                 return _skills;
 
-            using var client = new HttpClient();
             const string apiUrl = $"{BaseUrl}/skills?ids=all";
-            var response = await client.GetAsync(apiUrl);
+            var response = await Client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();
             var skills = JsonSerializer.Deserialize<Entities.Skill[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<Entities.Skill>();
@@ -255,9 +253,8 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             if (_legends != null)
                 return _legends;
 
-            using var client = new HttpClient();
             const string apiUrl = $"{BaseUrl}/legends?ids=all";
-            var response = await client.GetAsync(apiUrl);
+            var response = await Client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();
             var legends = JsonSerializer.Deserialize<Entities.Legend[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<Entities.Legend>();
@@ -301,9 +298,8 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             if (_itemStats != null)
                 return _itemStats;
 
-            using var client = new HttpClient();
             const string apiUrl = $"{BaseUrl}/itemstats?ids=all";
-            var response = await client.GetAsync(apiUrl);
+            var response = await Client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();
             var itemStats = JsonSerializer.Deserialize<Entities.ItemStat[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<Entities.ItemStat>();
@@ -335,9 +331,8 @@ namespace GW2EquipmentBuildChecker.Core.GW2
                 return cachedItem;
             }
 
-            using var client = new HttpClient();
             string apiUrl = $"{BaseUrl}/items/{itemId}";
-            var response = await client.GetAsync(apiUrl);
+            var response = await Client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();
             var item = JsonSerializer.Deserialize<Entities.Item>(contentResponse, JsonSerializerOptions.Web);
