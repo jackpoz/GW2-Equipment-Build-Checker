@@ -17,8 +17,9 @@ This tool compares:
 - Equipment stats
 - Equipment upgrades (runes, sigils)
 - Weapon types
+- Relic (only for active equipment template)
 
 ## Limitations
 Below limitations due to GW2 API:
-- Relics cannot be compared
+- Relics of non-active equipment templates cannot be compared
 - Non-legendary gear with selectable stats cannot be compared
