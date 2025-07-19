@@ -113,9 +113,13 @@ public sealed partial class MainPage : Page
             using var loader = new Loader(this);
 
             var selectedCharacterName = CharacterComboBox.SelectedItem.ToString();
-            var builds = await GW2API.GetBuildsAsync(selectedCharacterName);
+            var buildsTask = GW2API.GetBuildsAsync(selectedCharacterName);
+            var equipmentTask = GW2API.GetEquipmentsAsync(selectedCharacterName);
 
-            var equipments = new List<EquipmentTab>(await GW2API.GetEquipmentsAsync(selectedCharacterName));
+            await Task.WhenAll(buildsTask, equipmentTask);
+
+            var builds = await buildsTask;
+            var equipments = new List<EquipmentTab>(await equipmentTask);
             equipments.Insert(0, new EquipmentTab
             {
                 Tab = 0,
