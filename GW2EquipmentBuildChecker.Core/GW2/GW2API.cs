@@ -90,6 +90,9 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             var contentResponse = await SendRequestAsync(apiUrl);
             var equipmentTabs = JsonSerializer.Deserialize<EquipmentTab[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<EquipmentTab>();
 
+            var itemIds = equipmentTabs.SelectMany(et => et.Equipment.SelectMany(e => new[] { e.Id }.Concat(e.Upgrades).Concat(e.Infusions))).Distinct();
+            await GetItemsByIds(itemIds);
+
             // Skip aquatic weapons as they are not so relevant
             foreach (var equipmentContainer in equipmentTabs)
             {
@@ -326,19 +329,44 @@ namespace GW2EquipmentBuildChecker.Core.GW2
 
         public static async Task<Entities.Item> GetItemById(int itemId)
         {
-            if (_itemsCache.TryGetValue(itemId, out var cachedItem))
+            return (await GetItemsByIds([itemId])).Single();
+        }
+
+        public static async Task<Entities.Item[]> GetItemsByIds(IEnumerable<int> itemIds)
+        {
+            var items = new List<Entities.Item>();
+            var itemIdsToFetch = new List<int>();
+
+            // Try to get items from the cache first
+            foreach (var itemId in itemIds)
             {
-                return cachedItem;
+                if (_itemsCache.TryGetValue(itemId, out var cachedItem))
+                {
+                    items.Add(cachedItem);
+                }
+                else
+                {
+                    itemIdsToFetch.Add(itemId);
+                }
             }
 
-            string apiUrl = $"{BaseUrl}/items/{itemId}";
-            var response = await Client.GetAsync(apiUrl);
-            response.EnsureSuccessStatusCode();
-            var contentResponse = await response.Content.ReadAsStringAsync();
-            var item = JsonSerializer.Deserialize<Entities.Item>(contentResponse, JsonSerializerOptions.Web);
+            // Fetch items in bulk from GW2 API if not cached
+            if (itemIdsToFetch.Count != 0)
+            {
+                string apiUrl = $"{BaseUrl}/items?ids={string.Join(",", itemIdsToFetch)}";
+                var response = await Client.GetAsync(apiUrl);
+                response.EnsureSuccessStatusCode();
+                var contentResponse = await response.Content.ReadAsStringAsync();
+                var itemsFetched = JsonSerializer.Deserialize<Entities.Item[]>(contentResponse, JsonSerializerOptions.Web);
 
-            _itemsCache.TryAdd(itemId, item);
-            return item;
+                foreach (var item in itemsFetched)
+                {
+                    _itemsCache.TryAdd(item.Id, item);
+                    items.Add(item);
+                }
+            }
+
+            return [.. items];
         }
 
         private async Task<string> SendRequestAsync(string apiUrl)
