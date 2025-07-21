@@ -142,8 +142,9 @@ namespace GW2EquipmentBuildChecker.Core
                         if (sourceItem.Name != targetItem.Name)
                         {
                             differences.Add($"Relic mismatch: gw2skills has '{targetItem.Name}', GW2 has '{sourceItem.Name}'");
-                            continue;
                         }
+
+                        continue;
                     }
 
                     if (sourceItem.Stats?.Name != targetItem.Stats.Name)
