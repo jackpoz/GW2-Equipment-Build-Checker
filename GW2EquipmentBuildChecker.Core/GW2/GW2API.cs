@@ -196,7 +196,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             if (_specializations != null)
                 return _specializations;
 
-            const string apiUrl = $"{BaseUrl}/specializations?ids=all";
+            const string apiUrl = $"{BaseUrl}/specializations?ids=all&lang=en";
             var response = await Client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();
@@ -227,7 +227,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             if (_skills != null)
                 return _skills;
 
-            const string apiUrl = $"{BaseUrl}/skills?ids=all";
+            const string apiUrl = $"{BaseUrl}/skills?ids=all&lang=en";
             var response = await Client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();
@@ -301,7 +301,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             if (_itemStats != null)
                 return _itemStats;
 
-            const string apiUrl = $"{BaseUrl}/itemstats?ids=all";
+            const string apiUrl = $"{BaseUrl}/itemstats?ids=all&lang=en";
             var response = await Client.GetAsync(apiUrl);
             response.EnsureSuccessStatusCode();
             var contentResponse = await response.Content.ReadAsStringAsync();
@@ -355,7 +355,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             {
                 try
                 {
-                    string apiUrl = $"{BaseUrl}/items?ids={string.Join(",", itemIdsToFetch)}";
+                    string apiUrl = $"{BaseUrl}/items?ids={string.Join(",", itemIdsToFetch)}&lang=en";
                     var response = await Client.GetAsync(apiUrl);
                     response.EnsureSuccessStatusCode();
                     var contentResponse = await response.Content.ReadAsStringAsync();
