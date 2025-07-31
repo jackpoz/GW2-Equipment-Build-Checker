@@ -353,16 +353,37 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             // Fetch items in bulk from GW2 API if not cached
             if (itemIdsToFetch.Count != 0)
             {
-                string apiUrl = $"{BaseUrl}/items?ids={string.Join(",", itemIdsToFetch)}";
-                var response = await Client.GetAsync(apiUrl);
-                response.EnsureSuccessStatusCode();
-                var contentResponse = await response.Content.ReadAsStringAsync();
-                var itemsFetched = JsonSerializer.Deserialize<Entities.Item[]>(contentResponse, JsonSerializerOptions.Web);
-
-                foreach (var item in itemsFetched)
+                try
                 {
-                    _itemsCache.TryAdd(item.Id, item);
-                    items.Add(item);
+                    string apiUrl = $"{BaseUrl}/items?ids={string.Join(",", itemIdsToFetch)}";
+                    var response = await Client.GetAsync(apiUrl);
+                    response.EnsureSuccessStatusCode();
+                    var contentResponse = await response.Content.ReadAsStringAsync();
+                    var itemsFetched = JsonSerializer.Deserialize<Entities.Item[]>(contentResponse, JsonSerializerOptions.Web);
+
+                    foreach (var item in itemsFetched)
+                    {
+                        _itemsCache.TryAdd(item.Id, item);
+                        items.Add(item);
+                    }
+                }
+                catch (Exception)
+                {
+                    foreach (var itemId in itemIdsToFetch)
+                    {
+                        var item = new Entities.Item
+                        {
+                            Id = itemId,
+                            Name = $"(Item {itemId} not found)",
+                            Details = new Entities.ItemDetails
+                            {
+                                Type = "Unknown"
+                            }
+                        };
+
+                        _itemsCache.TryAdd(itemId, item);
+                        items.Add(item);
+                    }
                 }
             }
 

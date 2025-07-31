@@ -14,7 +14,7 @@
                 {
                     XamlRoot = Window.Current.Content.XamlRoot,
                     Title = "Error",
-                    Content = ex.Message,
+                    Content = ex.Message + Environment.NewLine + ex.StackTrace,
                     CloseButtonText = "OK"
                 }.ShowAsync();
             }
