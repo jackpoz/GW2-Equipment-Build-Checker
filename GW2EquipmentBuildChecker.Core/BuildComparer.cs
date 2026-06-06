@@ -83,6 +83,16 @@ namespace GW2EquipmentBuildChecker.Core
                         {
                             differences.Add($"Elite skill mismatch: gw2skills has '{await GW2API.GetSkillNameById(targetBuild.Skills.Elite)}', GW2 has '{await GW2API.GetSkillNameById(sourceBuild.Skills.Elite)}'");
                         }
+
+                        if (sourceBuild.Profession == "Ranger")
+                        {
+                            var diffSourcePets = sourceBuild.Pets.Terrestrial.Except(targetBuild.Pets.Terrestrial);
+                            var diffTargetPets = targetBuild.Pets.Terrestrial.Except(sourceBuild.Pets.Terrestrial);
+                            if (diffSourcePets.Any() || diffTargetPets.Any())
+                            {
+                                differences.Add($"Pets mismatch: gw2skills has '{string.Join(", ", await Task.WhenAll(diffTargetPets.Select(async p => await GW2API.GetPetNameById(p))))}', GW2 has '{string.Join(", ", await Task.WhenAll(diffSourcePets.Select(async p => await GW2API.GetPetNameById(p))))}'");
+                            }
+                        }
                     }
                 }
             }

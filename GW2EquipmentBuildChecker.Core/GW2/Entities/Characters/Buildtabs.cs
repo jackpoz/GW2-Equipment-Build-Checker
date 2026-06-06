@@ -30,6 +30,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities.Characters
         public List<Specialization> Specializations { get; set; }
         public SkillSet Skills { get; set; }
         public List<string> Legends { get; set; }
+        public PetSet Pets { get; set; }
     }
 
     public class Specialization
@@ -43,5 +44,11 @@ namespace GW2EquipmentBuildChecker.Core.GW2.Entities.Characters
         public int? Heal { get; set; }
         public List<int?> Utilities { get; set; }
         public int? Elite { get; set; }
+    }
+
+    public class PetSet
+    {
+        public List<int?> Terrestrial { get; set; }
+        public List<int?> Aquatic { get; set; }
     }
 }

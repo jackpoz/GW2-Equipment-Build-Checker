@@ -9,6 +9,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills.Entities
 {
     internal class Db
     {
+        public DbRows Pet { get; set; }
         public DbRows Profession { get; set; }
         public DbRows PrflType { get; set; }
         public DbRows Profile { get; set; }

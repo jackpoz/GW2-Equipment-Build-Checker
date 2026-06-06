@@ -18,6 +18,7 @@ namespace GW2EquipmentBuildChecker.Core.GW2
         private static Entities.Skill[] _skills { get; set; }
         private static Entities.Legend[] _legends { get; set; }
         private static Entities.ItemStat[] _itemStats { get; set; }
+        private static Entities.Pet[] _pets { get; set; }
 
         private static ConcurrentDictionary<int, Entities.Item> _itemsCache { get; } = new ConcurrentDictionary<int, Entities.Item>();
 
@@ -388,6 +389,40 @@ namespace GW2EquipmentBuildChecker.Core.GW2
             }
 
             return [.. items];
+        }
+
+        public static async Task<string> GetPetNameById(int? petId)
+        {
+            if (petId == null)
+                return "<Not set>";
+
+            var pet = (await GetPetsAsync()).First(p => p.Id == petId);
+            return pet.Name;
+        }
+
+        public static async Task<Entities.Pet> GetPetByName(string petName)
+        {
+            if (!petName.StartsWith("Juvenile"))
+                petName = "Juvenile " + petName;
+
+            var pet = (await GetPetsAsync()).First(p => p.Name == petName);
+            return pet;
+        }
+
+        public static async Task<Entities.Pet[]> GetPetsAsync()
+        {
+            if (_pets != null)
+                return _pets;
+
+            const string apiUrl = $"{BaseUrl}/pets?ids=all&lang=en";
+            var response = await Client.GetAsync(apiUrl);
+            response.EnsureSuccessStatusCode();
+            var contentResponse = await response.Content.ReadAsStringAsync();
+            var pets = JsonSerializer.Deserialize<Entities.Pet[]>(contentResponse, JsonSerializerOptions.Web) ?? Array.Empty<Entities.Pet>();
+
+            _pets = pets;
+
+            return pets;
         }
 
         private async Task<string> SendRequestAsync(string apiUrl)

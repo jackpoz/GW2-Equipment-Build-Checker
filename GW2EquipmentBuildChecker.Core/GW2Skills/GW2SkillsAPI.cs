@@ -135,11 +135,29 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             };
             build.Skills.Elite = (await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[0]["10"]))).Id;
 
-            if (build.Profession == "Revenant")
+            switch (build.Profession)
             {
-                var legend1 = (await GW2API.GetLegendBySkills(build.Skills.Heal.Value, build.Skills.Elite.Value)).Id;
-                var legend2 = (await GW2API.GetLegendBySkills((await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["6"]))).Id, (await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["10"]))).Id)).Id;
-                build.Legends = [legend1, legend2];
+                case "Revenant":
+                    {
+                        var legend1 = (await GW2API.GetLegendBySkills(build.Skills.Heal.Value, build.Skills.Elite.Value)).Id;
+                        var legend2 = (await GW2API.GetLegendBySkills((await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["6"]))).Id, (await GW2API.GetSkillByName(skillsInfo.GetSkillName(gw2SkillBuild.Preload.Skill.T[1]["10"]))).Id)).Id;
+                        build.Legends = [legend1, legend2];
+                        break;
+                    }
+                case "Ranger":
+                    {
+                        build.Pets = new PetSet
+                        {
+                            Terrestrial =
+                            [
+                                (await GW2API.GetPetByName(GetGW2PetNameFromGW2SkillsId(gw2SkillBuild.Preload.Pet.T[0], db))).Id,
+                                (await GW2API.GetPetByName(GetGW2PetNameFromGW2SkillsId(gw2SkillBuild.Preload.Pet.T[1], db))).Id
+                            ]
+                        };
+                        break;
+                    }
+                default:
+                    break;
             }
 
             var equipment = new List<GW2.Entities.Characters.Equipment>();
@@ -230,6 +248,12 @@ namespace GW2EquipmentBuildChecker.Core.GW2Skills
             var profileTypeName = profileType[2].GetString();
             var name = profileTypeName.Replace("+", "and");
             return name;
+        }
+
+        private string GetGW2PetNameFromGW2SkillsId(int petId, Db db)
+        {
+            var pet = db.Pet.Rows.First(p => p[0].GetInt32() == petId);
+            return pet[2].GetString();
         }
     }
 }
