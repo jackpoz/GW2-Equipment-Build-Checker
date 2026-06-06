@@ -63,7 +63,14 @@
           x:Name="CompareButton"
           AutomationProperties.AutomationId="CompareButton" />
 
-        <!-- Read-Only Message Text -->
+        <Button
+          Content="Refresh GW2 character and compare"
+          Width="300"
+          Click="RefreshAndCompareButton_Click"
+          x:Name="RefreshAndCompareButton"
+          AutomationProperties.AutomationId="RefreshAndCompareButton" />
+
+                <!-- Read-Only Message Text -->
         <TextBlock
           Text=""
           Width="300"

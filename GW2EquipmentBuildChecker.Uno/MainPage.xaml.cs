@@ -48,6 +48,7 @@ public sealed partial class MainPage : Page
         BuildUrlTextBox.Visibility = Visibility.Collapsed;
 
         CompareButton.Visibility = Visibility.Collapsed;
+        RefreshAndCompareButton.Visibility = Visibility.Collapsed;
 
         DifferencesTextBlock.Visibility = Visibility.Collapsed;
         DifferencesTextBlock.Text = "";
@@ -101,6 +102,7 @@ public sealed partial class MainPage : Page
             BuildUrlTextBox.Visibility = Visibility.Collapsed;
 
             CompareButton.Visibility = Visibility.Collapsed;
+            RefreshAndCompareButton.Visibility = Visibility.Collapsed;
 
             DifferencesTextBlock.Visibility = Visibility.Collapsed;
             DifferencesTextBlock.Text = "";
@@ -153,6 +155,7 @@ public sealed partial class MainPage : Page
                 BuildUrlTextBox.Visibility = Visibility.Collapsed;
 
                 CompareButton.Visibility = Visibility.Collapsed;
+                RefreshAndCompareButton.Visibility = Visibility.Collapsed;
                 return;
             }
 
@@ -161,58 +164,66 @@ public sealed partial class MainPage : Page
             BuildUrlTextBox.Visibility = Visibility.Visible;
 
             CompareButton.Visibility = Visibility.Visible;
+            RefreshAndCompareButton.Visibility = Visibility.Visible;
         });
     }
 
     private async void CompareButton_Click(object sender, RoutedEventArgs e)
     {
-        await Utilities.TryExecute(async () =>
+        await Utilities.TryExecute(Compare);
+    }
+
+    private async Task Compare()
+    {
+        DifferencesTextBlock.Visibility = Visibility.Collapsed;
+
+        if (string.IsNullOrEmpty(BuildUrlTextBox.Text))
         {
-            DifferencesTextBlock.Visibility = Visibility.Collapsed;
-
-            if (string.IsNullOrEmpty(BuildUrlTextBox.Text))
+            var dialog = new ContentDialog
             {
-                var dialog = new ContentDialog
-                {
-                    XamlRoot = XamlRoot,
-                    Title = "GW2Skills.net Build URL Required",
-                    Content = "Please enter a GW2Skills.net build URL.",
-                    CloseButtonText = "OK"
-                };
-                await dialog.ShowAsync();
-                return;
+                XamlRoot = XamlRoot,
+                Title = "GW2Skills.net Build URL Required",
+                Content = "Please enter a GW2Skills.net build URL.",
+                CloseButtonText = "OK"
+            };
+            await dialog.ShowAsync();
+            return;
+        }
+
+        using var loader = new Loader(this);
+
+        var (gw2skillsBuild, gw2skillsEquipment) = await GW2SkillsAPI.GetBuildAndEquipmentAsync(BuildUrlTextBox.Text);
+
+        // 6. Compare and find differences
+        var buildDifferences = await BuildComparer.CompareBuildAndEquipment(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild, ((EquipmentTab)(EquipmentComboBox.SelectedItem))?.Equipment, gw2skillsEquipment);
+
+        var differencesText = new StringBuilder();
+        // 7. Tell what to change
+        if (buildDifferences.Count == 0)
+        {
+            differencesText.AppendLine("No differences found");
+        }
+        else
+        {
+            if (buildDifferences.Count == 1 && buildDifferences.First().StartsWith("Disclaimer"))
+            {
+                differencesText.AppendLine("No differences found\n");
             }
 
-            using var loader = new Loader(this);
-
-            var (gw2skillsBuild, gw2skillsEquipment) = await GW2SkillsAPI.GetBuildAndEquipmentAsync(BuildUrlTextBox.Text);
-
-            // 6. Compare and find differences
-            var buildDifferences = await BuildComparer.CompareBuildAndEquipment(((BuildContainer)(BuildComboBox.SelectedItem)).Build, gw2skillsBuild, ((EquipmentTab)(EquipmentComboBox.SelectedItem))?.Equipment, gw2skillsEquipment);
-
-            var differencesText = new StringBuilder();
-            // 7. Tell what to change
-            if (buildDifferences.Count == 0)
+            foreach (var difference in buildDifferences)
             {
-                differencesText.AppendLine("No differences found");
+                differencesText.AppendLine(difference);
+                differencesText.AppendLine();
             }
-            else
-            {
-                if (buildDifferences.Count == 1 && buildDifferences.First().StartsWith("Disclaimer"))
-                {
-                    differencesText.AppendLine("No differences found\n");
-                }
+        }
 
-                foreach (var difference in buildDifferences)
-                {
-                    differencesText.AppendLine(difference);
-                    differencesText.AppendLine();
-                }
-            }
+        DifferencesTextBlock.Text = differencesText.ToString();
+        DifferencesTextBlock.Visibility = Visibility.Visible;
+    }
 
-            DifferencesTextBlock.Text = differencesText.ToString();
-            DifferencesTextBlock.Visibility = Visibility.Visible;
-        });
+    private async void RefreshAndCompareButton_Click(object sender, RoutedEventArgs e)
+    {
+        await Utilities.TryExecute(Compare);
     }
 
     private class Loader : IDisposable
