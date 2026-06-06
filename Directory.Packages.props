@@ -8,6 +8,6 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="9.0.6" />
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="10.0.8" />
   </ItemGroup>
 </Project>
